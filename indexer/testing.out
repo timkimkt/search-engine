@@ -1,0 +1,101 @@
+bash -v ./testing.sh 
+#!/bin/bash
+#
+# Simple testing script for indexer.c and indextest.c
+#
+# Tim (Kyoung Tae) Kim, CS50 Lab5
+# May, 2021
+
+dest='./indexfile'
+
+# make clean first if files already exist
+mkdir $dest
+
+# copy empty file to compare 
+cp -r $dest "${dest}-1"
+
+# various invalid arguments (zero, one, three)
+./indexer 
+Usage: ./indexer pageDirectory indexFilename
+./indexer ~/cs50-dev/shared/tse/output/letters-0
+Usage: ./indexer pageDirectory indexFilename
+./indexer ~/cs50-dev/shared/tse/output/letters-0 letters-0.index letters-0.index-1
+Usage: ./indexer pageDirectory indexFilename
+
+# invalid pageDirectory (non-existent, not crawler)
+./indexer ~/cs50-dev/non/existent/dir/letters-0 letters-0.index
+parseArgs: cannot open directory /thayerfs/home/f002qk2/cs50-dev/non/existent/dir/letters-0
+./indexer ~/cs50-dev/shared/COVID-19 letters-0.index
+parseArgs: not a file created by crawler
+
+# invalid indexfile (non-existent, read-only directory, read-only file)
+./indexer ~/cs50-dev/shared/tse/output/letters-0 ./non/existent/letters-0.index 
+parseArgs: cannot open ./non/existent/letters-0.index
+./indexer ~/cs50-dev/shared/tse/output/letters-0 ~/cs50-dev/shared/COVID-19
+parseArgs: cannot open /thayerfs/home/f002qk2/cs50-dev/shared/COVID-19
+./indexer ~/cs50-dev/shared/tse/output/letters-0 ~/cs50-dev/shared/COVID-19/LICENSE
+parseArgs: cannot open /thayerfs/home/f002qk2/cs50-dev/shared/COVID-19/LICENSE
+
+# valgrind on indexer.c
+valgrind ./indexer ~/cs50-dev/shared/tse/output/letters-0 ${dest}/letters-0.index 
+==32224== Memcheck, a memory error detector
+==32224== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==32224== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==32224== Command: ./indexer /thayerfs/home/f002qk2/cs50-dev/shared/tse/output/letters-0 ./indexfile/letters-0.index
+==32224== 
+==32224== 
+==32224== HEAP SUMMARY:
+==32224==     in use at exit: 0 bytes in 0 blocks
+==32224==   total heap usage: 325 allocs, 325 frees, 37,862 bytes allocated
+==32224== 
+==32224== All heap blocks were freed -- no leaks are possible
+==32224== 
+==32224== For counts of detected and suppressed errors, rerun with: -v
+==32224== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+# valgrind on indextest.c
+valgrind ./indextest ${dest}/letters-0.index ${dest}/letters-0.index.test 
+==32234== Memcheck, a memory error detector
+==32234== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==32234== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==32234== Command: ./indextest ./indexfile/letters-0.index ./indexfile/letters-0.index.test
+==32234== 
+==32234== 
+==32234== HEAP SUMMARY:
+==32234==     in use at exit: 0 bytes in 0 blocks
+==32234==   total heap usage: 52 allocs, 52 frees, 19,685 bytes allocated
+==32234== 
+==32234== All heap blocks were freed -- no leaks are possible
+==32234== 
+==32234== For counts of detected and suppressed errors, rerun with: -v
+==32234== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+# print nothing if there are no differences 
+~/cs50-dev/shared/tse/indexcmp ${dest}/letters-0.index ${dest}/letters-0.index.test
+
+# run indexer on variety of pageDirectories and test with indexcmp
+
+./indexer ~/cs50-dev/shared/tse/output/letters-10 ${dest}/letters-10.index 
+./indextest ${dest}/letters-10.index ${dest}/letters-10.index.test 
+# print nothing if there are no differences 
+~/cs50-dev/shared/tse/indexcmp ${dest}/letters-10.index ${dest}/letters-10.index.test
+
+./indexer ~/cs50-dev/shared/tse/output/wikipedia-1 ${dest}/wikipedia-1.index 
+./indextest ${dest}/wikipedia-1.index ${dest}/wikipedia-1.index.test 
+# print nothing if there are no differences 
+~/cs50-dev/shared/tse/indexcmp ${dest}/wikipedia-1.index ${dest}/wikipedia-1.index.test
+
+./indexer ~/cs50-dev/shared/tse/output/wikipedia-2 ${dest}/wikipedia-2.index 
+./indextest ${dest}/wikipedia-2.index ${dest}/wikipedia-2.index.test 
+# print nothing if there are no differences 
+~/cs50-dev/shared/tse/indexcmp ${dest}/wikipedia-2.index ${dest}/wikipedia-2.index.test
+
+./indexer ~/cs50-dev/shared/tse/output/toscrape-1 ${dest}/toscrape-1.index 
+./indextest ${dest}/toscrape-1.index ${dest}/toscrape-1.index.test 
+# print nothing if there are no differences 
+~/cs50-dev/shared/tse/indexcmp ${dest}/toscrape-1.index ${dest}/toscrape-1.index.test
+
+./indexer ~/cs50-dev/shared/tse/output/toscrape-2 ${dest}/toscrape-2.index 
+./indextest ${dest}/toscrape-2.index ${dest}/toscrape-2.index.test 
+# print nothing if there are no differences 
+~/cs50-dev/shared/tse/indexcmp ${dest}/toscrape-2.index ${dest}/toscrape-2.index.test

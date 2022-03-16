@@ -1,0 +1,365 @@
+bash -v ./testing.sh 
+#!/bin/bash
+#
+# Simple testing script for querier.c
+#
+# Tim (Kyoung Tae) Kim, CS50 Lab6
+# May, 2021
+
+# various invalid arguments (zero, one, three)
+./querier 
+Usage: ./querier pageDirectory indexFilename
+./querier ~/cs50-dev/shared/tse/output/letters-0
+Usage: ./querier pageDirectory indexFilename
+./querier ~/cs50-dev/shared/tse/output/letters-0 letters-0.index letters-0.index-1
+Usage: ./querier pageDirectory indexFilename
+
+# invalid pageDirectory (non-existent, not crawler)
+./querier ~/cs50-dev/non/existent/dir/letters-0 letters-0.index
+parseArgs: cannot open directory /thayerfs/home/f002qk2/cs50-dev/non/existent/dir/letters-0
+./querier ~/cs50-dev/shared/COVID-19 letters-0.index
+parseArgs: not a file created by crawler
+
+# invalid indexFilename (non-existent)
+./querier ~/cs50-dev/shared/tse/output/letters-0 ./non/existent/letters-0.index 
+parseArgs: cannot read ./non/existent/letters-0.index
+
+# syntax errors & invalid queries
+cat "./examples/syntax.txt" | ./querier ~/cs50-dev/shared/tse/output/wikipedia-1 ~/cs50-dev/shared/tse/output/wikipedia-1.index 
+Error: 'and' cannot be first
+Error: 'or' cannot be first
+Error: 'and' cannot be first
+Error: 'or' cannot be first
+Error: 'or' cannot be last
+Error: 'and' cannot be last
+'and' and 'or' cannot be adjacent
+'and' and 'and' cannot be adjacent
+'or' and 'and' cannot be adjacent
+Error2: bad character '!' in query
+Error1: bad character '(' in query
+
+
+# printing clean query
+echo " tHIs     seNTEnce  iS  nOrmAL  " | ./querier ~/cs50-dev/shared/tse/output/wikipedia-1 ~/cs50-dev/shared/tse/output/wikipedia-1.index 
+Query: this sentence is normal 
+Matches 2 documents (ranked) :
+score   2 doc   6:  http://cs50tse.cs.dartmouth.edu/tse/wikipedia/C_(programming_language).html 
+score   1 doc   3:  http://cs50tse.cs.dartmouth.edu/tse/wikipedia/Hash_table.html 
+-----------------------------------------------
+
+
+# print nothing is query is empty
+echo "          " | ./querier ~/cs50-dev/shared/tse/output/wikipedia-1 ~/cs50-dev/shared/tse/output/wikipedia-1.index 
+
+    
+# print no documents match if query returns nothing
+echo "dirichlet" | ./querier ~/cs50-dev/shared/tse/output/wikipedia-1 ~/cs50-dev/shared/tse/output/wikipedia-1.index 
+Query: dirichlet 
+No documents match
+-----------------------------------------------
+
+
+# equivalent single-word examples
+echo "Magnificent" | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index 
+Query: magnificent 
+Matches 3 documents (ranked) :
+score   2 doc  33:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/shakespeares-sonnets_989/index.html 
+score   1 doc 228:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-collected-poems-of-wb-yeats-the-collected-works-of-wb-yeats-1_441/index.html 
+score   1 doc  71:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/all-the-light-we-cannot-see_660/index.html 
+-----------------------------------------------
+
+
+echo "magnificent" | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index 
+Query: magnificent 
+Matches 3 documents (ranked) :
+score   2 doc  33:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/shakespeares-sonnets_989/index.html 
+score   1 doc 228:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-collected-poems-of-wb-yeats-the-collected-works-of-wb-yeats-1_441/index.html 
+score   1 doc  71:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/all-the-light-we-cannot-see_660/index.html 
+-----------------------------------------------
+
+
+echo "         magnificent" | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index 
+Query: magnificent 
+Matches 3 documents (ranked) :
+score   2 doc  33:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/shakespeares-sonnets_989/index.html 
+score   1 doc 228:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-collected-poems-of-wb-yeats-the-collected-works-of-wb-yeats-1_441/index.html 
+score   1 doc  71:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/all-the-light-we-cannot-see_660/index.html 
+-----------------------------------------------
+
+
+# equivalent two-word examples / implicit and explicit 'and' are equivalent
+echo "John Wick" | ./querier ~/cs50-dev/shared/tse/output/toscrape-1 ~/cs50-dev/shared/tse/output/toscrape-1.index 
+Query: john wick 
+Matches 1 documents (ranked) :
+score   2 doc   4:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/libertarianism-for-beginners_982/index.html 
+-----------------------------------------------
+
+
+echo "john wick" | ./querier ~/cs50-dev/shared/tse/output/toscrape-1 ~/cs50-dev/shared/tse/output/toscrape-1.index 
+Query: john wick 
+Matches 1 documents (ranked) :
+score   2 doc   4:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/libertarianism-for-beginners_982/index.html 
+-----------------------------------------------
+
+
+echo "john and wick" | ./querier ~/cs50-dev/shared/tse/output/toscrape-1 ~/cs50-dev/shared/tse/output/toscrape-1.index 
+Query: john and wick 
+Matches 1 documents (ranked) :
+score   2 doc   4:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/libertarianism-for-beginners_982/index.html 
+-----------------------------------------------
+
+
+echo "          john      AND    wick    " | ./querier ~/cs50-dev/shared/tse/output/toscrape-1 ~/cs50-dev/shared/tse/output/toscrape-1.index 
+Query: john and wick 
+Matches 1 documents (ranked) :
+score   2 doc   4:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/libertarianism-for-beginners_982/index.html 
+-----------------------------------------------
+
+
+# difference between 'and' vs 'or' queries
+echo "play and ted" |./querier ~/cs50-dev/shared/tse/output/wikipedia-1 ~/cs50-dev/shared/tse/output/wikipedia-1.index 
+Query: play and ted 
+Matches 1 documents (ranked) :
+score   1 doc   3:  http://cs50tse.cs.dartmouth.edu/tse/wikipedia/Hash_table.html 
+-----------------------------------------------
+
+
+echo "play or ted" |./querier ~/cs50-dev/shared/tse/output/wikipedia-1 ~/cs50-dev/shared/tse/output/wikipedia-1.index 
+Query: play or ted 
+Matches 3 documents (ranked) :
+score   2 doc   4:  http://cs50tse.cs.dartmouth.edu/tse/wikipedia/Dartmouth_College.html 
+score   2 doc   3:  http://cs50tse.cs.dartmouth.edu/tse/wikipedia/Hash_table.html 
+score   1 doc   5:  http://cs50tse.cs.dartmouth.edu/tse/wikipedia/Unix.html 
+-----------------------------------------------
+
+
+# testing with fuzzquery that generate random queries (index, no of queries, seed)
+declare -i nquery
+declare -i seed
+nquery=10
+seed=0
+./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index $nquery $seed | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+./fuzzquery: generating 10 queries from 13563 words
+Query: inthe and quarters 
+No documents match
+-----------------------------------------------
+Query: hangs or visited kahneman or beneath shopping 
+Matches 3 documents (ranked) :
+score   1 doc 569:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-last-mile-amos-decker-2_754/index.html 
+score   1 doc 536:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-last-painting-of-sara-de-vos_259/index.html 
+score   1 doc 171:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/night-shift-night-shift-1-20_335/index.html 
+-----------------------------------------------
+Query: nationally holery or predicts 
+Matches 1 documents (ranked) :
+score   1 doc 246:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-grand-design_405/index.html 
+-----------------------------------------------
+Query: answers axell conduct or christine or mississippians or sorbonne 
+Matches 2 documents (ranked) :
+score   2 doc 357:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-piece-of-sky-a-grain-of-rice-a-memoir-in-four-meditations_878/index.html 
+score   1 doc 367:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/orchestra-of-exiles-the-story-of-bronislaw-huberman-the-israel-philharmonic-and-the-one-thousand-jews-he-saved-from-nazi-horrors_337/index.html 
+-----------------------------------------------
+Query: endowment or cosmic lover sketchbook and priest or bfed 
+Matches 2 documents (ranked) :
+score   1 doc  28:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/olio_984/index.html 
+score   1 doc  20:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/black-dust_976/index.html 
+-----------------------------------------------
+Query: orientation iceland describe worse or defeating 
+Matches 1 documents (ranked) :
+score   2 doc 499:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/beowulf_126/index.html 
+-----------------------------------------------
+Query: clerks 
+Matches 1 documents (ranked) :
+score   1 doc 157:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-distant-mirror-the-calamitous-14th-century_652/index.html 
+-----------------------------------------------
+Query: arnold streusel or braved 
+Matches 1 documents (ranked) :
+score   1 doc 150:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-mathews-men-seven-brothers-and-the-war-against-hitlers-u-boats_408/index.html 
+-----------------------------------------------
+Query: multiplatform 
+Matches 1 documents (ranked) :
+score   1 doc 204:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/m-train_598/index.html 
+-----------------------------------------------
+Query: patience or nightstruck or bowerbird and antoinette and stances 
+Matches 9 documents (ranked) :
+score   5 doc 524:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/patience_916/index.html 
+score   1 doc 523:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/outcast-vol-1-a-darkness-surrounds-him-outcast-1_915/index.html 
+score   1 doc 522:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/orange-the-complete-collection-1-orange-the-complete-collection-1_914/index.html 
+score   1 doc 521:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lumberjanes-vol-2-friendship-to-the-max-lumberjanes-5-8_907/index.html 
+score   1 doc 520:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lumberjanes-vol-1-beware-the-kitten-holy-lumberjanes-1-4_906/index.html 
+score   1 doc 519:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lumberjanes-vol-3-a-terrible-plan-lumberjanes-9-12_905/index.html 
+score   1 doc 518:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/i-hate-fairyland-vol-1-madly-ever-after-i-hate-fairyland-compilations-1-5_899/index.html 
+score   1 doc 511:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sequential-art_5/index.html 
+score   1 doc 255:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/young-adult_21/page-2.html 
+-----------------------------------------------
+
+
+# run valgrind with queries generated by fuzzquery 
+./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index $nquery $seed | valgrind -v --leak-check=full --show-leak-kinds=all ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+==10190== Memcheck, a memory error detector
+==10190== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==10190== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==10190== Command: ./querier /thayerfs/home/f002qk2/cs50-dev/shared/tse/output/toscrape-2 /thayerfs/home/f002qk2/cs50-dev/shared/tse/output/toscrape-2.index
+==10190== 
+--10190-- Valgrind options:
+--10190--    -v
+--10190--    --leak-check=full
+--10190--    --show-leak-kinds=all
+--10190-- Contents of /proc/version:
+--10190--   Linux version 4.15.0-137-generic (buildd@lcy01-amd64-011) (gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)) #141-Ubuntu SMP Fri Feb 19 13:46:27 UTC 2021
+--10190-- 
+--10190-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-rdtscp-sse3-avx
+--10190-- Page sizes: currently 4096, max supported 4096
+--10190-- Valgrind library directory: /usr/lib/valgrind
+--10190-- Reading syms from /thayerfs/home/f002qk2/cs50-dev/tse-ktkim980/querier/querier
+--10190-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
+--10190--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
+--10190--   .. CRC mismatch (computed 0ef8daab wanted 65bccefe)
+--10190--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
+--10190--   .. CRC is valid
+./fuzzquery: generating 10 queries from 13563 words
+--10190-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--10190--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--10190--   .. CRC mismatch (computed 41ddb025 wanted 9972f546)
+--10190--    object doesn't have a symbol table
+--10190--    object doesn't have a dynamic symbol table
+--10190-- Scheduler: using generic scheduler lock implementation.
+--10190-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==10190== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-10190-by-f002qk2-on-???
+==10190== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-10190-by-f002qk2-on-???
+==10190== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-10190-by-f002qk2-on-???
+==10190== 
+==10190== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==10190== don't want to do, unless you know exactly what you're doing,
+==10190== or are doing some strange experiment):
+==10190==   /usr/lib/valgrind/../../bin/vgdb --pid=10190 ...command...
+==10190== 
+==10190== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==10190==   /path/to/gdb ./querier
+==10190== and then give GDB the following command
+==10190==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=10190
+==10190== --pid is optional if only one valgrind process is running
+==10190== 
+--10190-- REDIR: 0x4020d20 (ld-linux-x86-64.so.2:strlen) redirected to 0x580608c1 (???)
+--10190-- REDIR: 0x4020b00 (ld-linux-x86-64.so.2:index) redirected to 0x580608db (???)
+--10190-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--10190--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--10190--   .. CRC mismatch (computed 50df1b30 wanted 4800a4cf)
+--10190--    object doesn't have a symbol table
+--10190-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--10190--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--10190--   .. CRC mismatch (computed f893b962 wanted 95ee359e)
+--10190--    object doesn't have a symbol table
+==10190== WARNING: new redirection conflicts with existing -- ignoring it
+--10190--     old: 0x04020d20 (strlen              ) R-> (0000.0) 0x580608c1 ???
+--10190--     new: 0x04020d20 (strlen              ) R-> (2007.0) 0x04c34db0 strlen
+--10190-- REDIR: 0x401d540 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c35ee0 (strcmp)
+--10190-- REDIR: 0x4021260 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c394f0 (mempcpy)
+--10190-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
+--10190--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
+--10190--   .. CRC mismatch (computed cb654923 wanted 8713c55a)
+--10190--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
+--10190--   .. CRC is valid
+--10190-- REDIR: 0x4edcb70 (libc.so.6:memmove) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edbe80 (libc.so.6:strncpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edce50 (libc.so.6:strcasecmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edb8d0 (libc.so.6:strcat) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edbeb0 (libc.so.6:rindex) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4ede5a0 (libc.so.6:rawmemchr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcce0 (libc.so.6:mempcpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcb10 (libc.so.6:bcmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edbe40 (libc.so.6:strncmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edb940 (libc.so.6:strcmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcc40 (libc.so.6:memset) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4ef9ed0 (libc.so.6:wcschr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edbde0 (libc.so.6:strnlen) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edb9b0 (libc.so.6:strcspn) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcea0 (libc.so.6:strncasecmp) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edb980 (libc.so.6:strcpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcfe0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edbee0 (libc.so.6:strpbrk) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edb900 (libc.so.6:index) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edbdb0 (libc.so.6:strlen) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4ee64a0 (libc.so.6:memrchr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcef0 (libc.so.6:strcasecmp_l) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcae0 (libc.so.6:memchr) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4efac90 (libc.so.6:wcslen) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edc190 (libc.so.6:strspn) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edce20 (libc.so.6:stpncpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcdf0 (libc.so.6:stpcpy) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4ede5d0 (libc.so.6:strchrnul) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edcf40 (libc.so.6:strncasecmp_l) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4edbe10 (libc.so.6:strncat) redirected to 0x4a2c6e0 (_vgnU_ifunc_wrapper)
+--10190-- REDIR: 0x4eef110 (libc.so.6:__strrchr_sse2) redirected to 0x4c34790 (__strrchr_sse2)
+--10190-- REDIR: 0x4ed5140 (libc.so.6:malloc) redirected to 0x4c31aa0 (malloc)
+--10190-- REDIR: 0x4edc6c0 (libc.so.6:__GI_strstr) redirected to 0x4c39760 (__strstr_sse2)
+--10190-- REDIR: 0x4ed5a30 (libc.so.6:free) redirected to 0x4c32cd0 (free)
+--10190-- REDIR: 0x4eef400 (libc.so.6:__strlen_sse2) redirected to 0x4c34d30 (__strlen_sse2)
+--10190-- REDIR: 0x4eeef00 (libc.so.6:__strchrnul_sse2) redirected to 0x4c39020 (strchrnul)
+--10190-- REDIR: 0x4ef9220 (libc.so.6:__mempcpy_sse2_unaligned) redirected to 0x4c39130 (mempcpy)
+--10190-- REDIR: 0x4ee9a80 (libc.so.6:__rawmemchr_sse2) redirected to 0x4c39050 (rawmemchr)
+--10190-- REDIR: 0x4ed6d70 (libc.so.6:realloc) redirected to 0x4c33cb0 (realloc)
+--10190-- REDIR: 0x4ef4320 (libc.so.6:__strcpy_sse2_unaligned) redirected to 0x4c34dd0 (strcpy)
+--10190-- REDIR: 0x4ee7c50 (libc.so.6:__strcmp_sse2_unaligned) redirected to 0x4c35da0 (strcmp)
+--10190-- REDIR: 0x4ed8170 (libc.so.6:calloc) redirected to 0x4c33a70 (calloc)
+--10190-- REDIR: 0x4ef9240 (libc.so.6:memcpy@GLIBC_2.2.5) redirected to 0x4c36060 (memcpy@GLIBC_2.2.5)
+Query: inthe and quarters 
+No documents match
+-----------------------------------------------
+Query: hangs or visited kahneman or beneath shopping 
+Matches 3 documents (ranked) :
+score   1 doc 569:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-last-mile-amos-decker-2_754/index.html 
+score   1 doc 536:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-last-painting-of-sara-de-vos_259/index.html 
+score   1 doc 171:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/night-shift-night-shift-1-20_335/index.html 
+-----------------------------------------------
+Query: nationally holery or predicts 
+Matches 1 documents (ranked) :
+score   1 doc 246:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-grand-design_405/index.html 
+-----------------------------------------------
+Query: answers axell conduct or christine or mississippians or sorbonne 
+Matches 2 documents (ranked) :
+score   2 doc 357:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-piece-of-sky-a-grain-of-rice-a-memoir-in-four-meditations_878/index.html 
+score   1 doc 367:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/orchestra-of-exiles-the-story-of-bronislaw-huberman-the-israel-philharmonic-and-the-one-thousand-jews-he-saved-from-nazi-horrors_337/index.html 
+-----------------------------------------------
+Query: endowment or cosmic lover sketchbook and priest or bfed 
+Matches 2 documents (ranked) :
+score   1 doc  28:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/olio_984/index.html 
+score   1 doc  20:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/black-dust_976/index.html 
+-----------------------------------------------
+Query: orientation iceland describe worse or defeating 
+Matches 1 documents (ranked) :
+score   2 doc 499:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/beowulf_126/index.html 
+-----------------------------------------------
+Query: clerks 
+Matches 1 documents (ranked) :
+score   1 doc 157:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/a-distant-mirror-the-calamitous-14th-century_652/index.html 
+-----------------------------------------------
+Query: arnold streusel or braved 
+Matches 1 documents (ranked) :
+score   1 doc 150:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/the-mathews-men-seven-brothers-and-the-war-against-hitlers-u-boats_408/index.html 
+-----------------------------------------------
+Query: multiplatform 
+Matches 1 documents (ranked) :
+score   1 doc 204:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/m-train_598/index.html 
+-----------------------------------------------
+Query: patience or nightstruck or bowerbird and antoinette and stances 
+Matches 9 documents (ranked) :
+score   5 doc 524:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/patience_916/index.html 
+score   1 doc 523:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/outcast-vol-1-a-darkness-surrounds-him-outcast-1_915/index.html 
+score   1 doc 522:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/orange-the-complete-collection-1-orange-the-complete-collection-1_914/index.html 
+score   1 doc 521:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lumberjanes-vol-2-friendship-to-the-max-lumberjanes-5-8_907/index.html 
+score   1 doc 520:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lumberjanes-vol-1-beware-the-kitten-holy-lumberjanes-1-4_906/index.html 
+score   1 doc 519:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/lumberjanes-vol-3-a-terrible-plan-lumberjanes-9-12_905/index.html 
+score   1 doc 518:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/i-hate-fairyland-vol-1-madly-ever-after-i-hate-fairyland-compilations-1-5_899/index.html 
+score   1 doc 511:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/sequential-art_5/index.html 
+score   1 doc 255:  http://cs50tse.cs.dartmouth.edu/tse/toscrape/catalogue/category/books/young-adult_21/page-2.html 
+-----------------------------------------------
+
+==10190== 
+==10190== HEAP SUMMARY:
+==10190==     in use at exit: 0 bytes in 0 blocks
+==10190==   total heap usage: 218,823 allocs, 218,823 frees, 1,319,398,783 bytes allocated
+==10190== 
+==10190== All heap blocks were freed -- no leaks are possible
+==10190== 
+==10190== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==10190== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

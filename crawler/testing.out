@@ -1,0 +1,3764 @@
+bash -v ./testing.sh 
+#!/bin/bash
+#
+# Simple testing script for crawler.c
+#
+# Tim (Kyoung Tae) Kim, CS50 Lab4
+# April, 2021
+
+# make clean first if files already exist
+mkdir ../data
+mkdir ../data/letters-{0..2}
+mkdir ../data/letters-10
+mkdir ../data/toscrape-{0..3}
+mkdir ../data/wikipedia-{0..2}
+
+# copy empty file to compare 
+cp -r ../data ../data-1
+
+# erroneous arguments: missing arguments
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html ../data/letters-2 
+Usage: ./crawler seedURL pageDirectory maxDepth
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+Usage: ./crawler seedURL pageDirectory maxDepth
+
+# erroneous arguments: invalid directory or depth
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html ../data/noname 2
+parseArgs: unable to write pageDirectory/.crawler
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html ../data/letters-2 -1
+parseArgs: maxDepth out of range
+
+# valgrind with toscrape
+valgrind ./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/toscrape-1 1
+==11005== Memcheck, a memory error detector
+==11005== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==11005== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==11005== Command: ./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/toscrape-1 1
+==11005== 
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 428 malloc, 4 free, 0 free(NULL), 424 net
+After crawl: 574 malloc, 574 free, 0 free(NULL), 0 net
+At end of Main: 574 malloc, 574 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0==11005== 
+==11005== HEAP SUMMARY:
+==11005==     in use at exit: 0 bytes in 0 blocks
+==11005==   total heap usage: 2,352,366 allocs, 2,352,366 frees, 44,057,842,460 bytes allocated
+==11005== 
+==11005== All heap blocks were freed -- no leaks are possible
+==11005== 
+==11005== For counts of detected and suppressed errors, rerun with: -v
+==11005== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+# run with all three CS website
+# letters at depth 0, 1, 2 and 10
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html ../data/letters-0 0
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After crawl: 209 malloc, 209 free, 0 free(NULL), 0 net
+At end of Main: 209 malloc, 209 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html ../data/letters-1 1
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 212 malloc, 4 free, 0 free(NULL), 208 net
+After crawl: 214 malloc, 214 free, 0 free(NULL), 0 net
+At end of Main: 214 malloc, 214 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html ../data/letters-2 2
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 212 malloc, 4 free, 0 free(NULL), 208 net
+After pagescan: 217 malloc, 7 free, 0 free(NULL), 210 net
+After crawl: 219 malloc, 219 free, 0 free(NULL), 0 net
+At end of Main: 219 malloc, 219 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/index.html ../data/letters-10 10
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 212 malloc, 4 free, 0 free(NULL), 208 net
+After pagescan: 217 malloc, 7 free, 0 free(NULL), 210 net
+After pagescan: 228 malloc, 10 free, 0 free(NULL), 218 net
+After pagescan: 236 malloc, 13 free, 0 free(NULL), 223 net
+After pagescan: 241 malloc, 16 free, 0 free(NULL), 225 net
+After pagescan: 243 malloc, 19 free, 0 free(NULL), 224 net
+After pagescan: 245 malloc, 22 free, 0 free(NULL), 223 net
+After pagescan: 247 malloc, 25 free, 0 free(NULL), 222 net
+After pagescan: 249 malloc, 28 free, 0 free(NULL), 221 net
+After crawl: 249 malloc, 249 free, 0 free(NULL), 0 net
+At end of Main: 249 malloc, 249 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0
+# toscrape at depth 0, 1 
+./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/toscrape-0 0
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After crawl: 209 malloc, 209 free, 0 free(NULL), 0 net
+At end of Main: 209 malloc, 209 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/toscrape-1 1
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 428 malloc, 4 free, 0 free(NULL), 424 net
+After crawl: 574 malloc, 574 free, 0 free(NULL), 0 net
+At end of Main: 574 malloc, 574 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/toscrape-2 2
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 428 malloc, 4 free, 0 free(NULL), 424 net
+After pagescan: 496 malloc, 7 free, 0 free(NULL), 489 net
+After pagescan: 542 malloc, 76 free, 0 free(NULL), 466 net
+After pagescan: 544 malloc, 79 free, 0 free(NULL), 465 net
+After pagescan: 546 malloc, 82 free, 0 free(NULL), 464 net
+After pagescan: 548 malloc, 85 free, 0 free(NULL), 463 net
+After pagescan: 550 malloc, 88 free, 0 free(NULL), 462 net
+After pagescan: 552 malloc, 91 free, 0 free(NULL), 461 net
+After pagescan: 554 malloc, 94 free, 0 free(NULL), 460 net
+After pagescan: 556 malloc, 97 free, 0 free(NULL), 459 net
+After pagescan: 558 malloc, 100 free, 0 free(NULL), 458 net
+After pagescan: 560 malloc, 103 free, 0 free(NULL), 457 net
+After pagescan: 562 malloc, 106 free, 0 free(NULL), 456 net
+After pagescan: 564 malloc, 109 free, 0 free(NULL), 455 net
+After pagescan: 566 malloc, 112 free, 0 free(NULL), 454 net
+After pagescan: 568 malloc, 115 free, 0 free(NULL), 453 net
+After pagescan: 570 malloc, 118 free, 0 free(NULL), 452 net
+After pagescan: 572 malloc, 121 free, 0 free(NULL), 451 net
+After pagescan: 574 malloc, 124 free, 0 free(NULL), 450 net
+After pagescan: 576 malloc, 127 free, 0 free(NULL), 449 net
+After pagescan: 578 malloc, 130 free, 0 free(NULL), 448 net
+After pagescan: 580 malloc, 133 free, 0 free(NULL), 447 net
+After pagescan: 585 malloc, 136 free, 0 free(NULL), 449 net
+After pagescan: 592 malloc, 142 free, 0 free(NULL), 450 net
+After pagescan: 599 malloc, 148 free, 0 free(NULL), 451 net
+After pagescan: 609 malloc, 154 free, 0 free(NULL), 455 net
+After pagescan: 627 malloc, 163 free, 0 free(NULL), 464 net
+After pagescan: 640 malloc, 178 free, 0 free(NULL), 462 net
+After pagescan: 647 malloc, 184 free, 0 free(NULL), 463 net
+After pagescan: 654 malloc, 190 free, 0 free(NULL), 464 net
+After pagescan: 667 malloc, 196 free, 0 free(NULL), 471 net
+After pagescan: 681 malloc, 208 free, 0 free(NULL), 473 net
+After pagescan: 702 malloc, 217 free, 0 free(NULL), 485 net
+After pagescan: 717 malloc, 235 free, 0 free(NULL), 482 net
+After pagescan: 736 malloc, 241 free, 0 free(NULL), 495 net
+After pagescan: 757 malloc, 259 free, 0 free(NULL), 498 net
+After pagescan: 789 malloc, 271 free, 0 free(NULL), 518 net
+After pagescan: 822 malloc, 298 free, 0 free(NULL), 524 net
+After pagescan: 867 malloc, 316 free, 0 free(NULL), 551 net
+After pagescan: 909 malloc, 352 free, 0 free(NULL), 557 net
+After pagescan: 983 malloc, 373 free, 0 free(NULL), 610 net
+After pagescan: 1076 malloc, 436 free, 0 free(NULL), 640 net
+After pagescan: 1163 malloc, 490 free, 0 free(NULL), 673 net
+After pagescan: 1229 malloc, 544 free, 0 free(NULL), 685 net
+After pagescan: 1254 malloc, 577 free, 0 free(NULL), 677 net
+After pagescan: 1261 malloc, 583 free, 0 free(NULL), 678 net
+After pagescan: 1292 malloc, 589 free, 0 free(NULL), 703 net
+After pagescan: 1333 malloc, 619 free, 0 free(NULL), 714 net
+After pagescan: 1370 malloc, 643 free, 0 free(NULL), 727 net
+After pagescan: 1389 malloc, 667 free, 0 free(NULL), 722 net
+After pagescan: 1435 malloc, 673 free, 0 free(NULL), 762 net
+After pagescan: 1507 malloc, 718 free, 0 free(NULL), 789 net
+After pagescan: 1594 malloc, 763 free, 0 free(NULL), 831 net
+After pagescan: 1652 malloc, 823 free, 0 free(NULL), 829 net
+After pagescan: 1729 malloc, 844 free, 0 free(NULL), 885 net
+After pagescan: 1836 malloc, 910 free, 0 free(NULL), 926 net
+After pagescan: 1895 malloc, 976 free, 0 free(NULL), 919 net
+After pagescan: 1952 malloc, 994 free, 0 free(NULL), 958 net
+After pagescan: 2026 malloc, 1042 free, 0 free(NULL), 984 net
+After pagescan: 2086 malloc, 1087 free, 0 free(NULL), 999 net
+After pagescan: 2165 malloc, 1120 free, 0 free(NULL), 1045 net
+After pagescan: 2226 malloc, 1180 free, 0 free(NULL), 1046 net
+After pagescan: 2299 malloc, 1204 free, 0 free(NULL), 1095 net
+After pagescan: 2399 malloc, 1264 free, 0 free(NULL), 1135 net
+After pagescan: 2492 malloc, 1327 free, 0 free(NULL), 1165 net
+After pagescan: 2585 malloc, 1381 free, 0 free(NULL), 1204 net
+After pagescan: 2655 malloc, 1441 free, 0 free(NULL), 1214 net
+After pagescan: 2734 malloc, 1474 free, 0 free(NULL), 1260 net
+After pagescan: 2834 malloc, 1534 free, 0 free(NULL), 1300 net
+After pagescan: 2936 malloc, 1597 free, 0 free(NULL), 1339 net
+After pagescan: 3035 malloc, 1660 free, 0 free(NULL), 1375 net
+After pagescan: 3105 malloc, 1720 free, 0 free(NULL), 1385 net
+After pagescan: 3130 malloc, 1753 free, 0 free(NULL), 1377 net
+After pagescan: 3134 malloc, 1759 free, 0 free(NULL), 1375 net
+After crawl: 3134 malloc, 3134 free, 0 free(NULL), 0 net
+At end of Main: 3134 malloc, 3134 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/toscrape-3 3
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 428 malloc, 4 free, 0 free(NULL), 424 net
+After pagescan: 496 malloc, 7 free, 0 free(NULL), 489 net
+After pagescan: 561 malloc, 10 free, 0 free(NULL), 551 net
+After pagescan: 605 malloc, 76 free, 0 free(NULL), 529 net
+After pagescan: 625 malloc, 79 free, 0 free(NULL), 546 net
+After pagescan: 651 malloc, 100 free, 0 free(NULL), 551 net
+After pagescan: 679 malloc, 115 free, 0 free(NULL), 564 net
+After pagescan: 702 malloc, 136 free, 0 free(NULL), 566 net
+After pagescan: 713 malloc, 148 free, 0 free(NULL), 565 net
+After pagescan: 735 malloc, 154 free, 0 free(NULL), 581 net
+After pagescan: 764 malloc, 175 free, 0 free(NULL), 589 net
+After pagescan: 779 malloc, 193 free, 0 free(NULL), 586 net
+After pagescan: 798 malloc, 199 free, 0 free(NULL), 599 net
+After pagescan: 825 malloc, 217 free, 0 free(NULL), 608 net
+After pagescan: 855 malloc, 235 free, 0 free(NULL), 620 net
+After pagescan: 872 malloc, 256 free, 0 free(NULL), 616 net
+After pagescan: 879 malloc, 262 free, 0 free(NULL), 617 net
+After pagescan: 886 malloc, 268 free, 0 free(NULL), 618 net
+After pagescan: 893 malloc, 274 free, 0 free(NULL), 619 net
+After pagescan: 912 malloc, 280 free, 0 free(NULL), 632 net
+After pagescan: 927 malloc, 298 free, 0 free(NULL), 629 net
+After pagescan: 949 malloc, 304 free, 0 free(NULL), 645 net
+After pagescan: 981 malloc, 325 free, 0 free(NULL), 656 net
+After pagescan: 998 malloc, 346 free, 0 free(NULL), 652 net
+After pagescan: 1002 malloc, 352 free, 0 free(NULL), 650 net
+After pagescan: 1004 malloc, 355 free, 0 free(NULL), 649 net
+After pagescan: 1006 malloc, 358 free, 0 free(NULL), 648 net
+After pagescan: 1008 malloc, 361 free, 0 free(NULL), 647 net
+After pagescan: 1010 malloc, 364 free, 0 free(NULL), 646 net
+After pagescan: 1012 malloc, 367 free, 0 free(NULL), 645 net
+After pagescan: 1014 malloc, 370 free, 0 free(NULL), 644 net
+After pagescan: 1016 malloc, 373 free, 0 free(NULL), 643 net
+After pagescan: 1018 malloc, 376 free, 0 free(NULL), 642 net
+After pagescan: 1020 malloc, 379 free, 0 free(NULL), 641 net
+After pagescan: 1022 malloc, 382 free, 0 free(NULL), 640 net
+After pagescan: 1024 malloc, 385 free, 0 free(NULL), 639 net
+After pagescan: 1026 malloc, 388 free, 0 free(NULL), 638 net
+After pagescan: 1028 malloc, 391 free, 0 free(NULL), 637 net
+After pagescan: 1030 malloc, 394 free, 0 free(NULL), 636 net
+After pagescan: 1032 malloc, 397 free, 0 free(NULL), 635 net
+After pagescan: 1034 malloc, 400 free, 0 free(NULL), 634 net
+After pagescan: 1036 malloc, 403 free, 0 free(NULL), 633 net
+After pagescan: 1038 malloc, 406 free, 0 free(NULL), 632 net
+After pagescan: 1040 malloc, 409 free, 0 free(NULL), 631 net
+After pagescan: 1045 malloc, 412 free, 0 free(NULL), 633 net
+After pagescan: 1065 malloc, 415 free, 0 free(NULL), 650 net
+After pagescan: 1079 malloc, 436 free, 0 free(NULL), 643 net
+After pagescan: 1081 malloc, 439 free, 0 free(NULL), 642 net
+After pagescan: 1083 malloc, 442 free, 0 free(NULL), 641 net
+After pagescan: 1091 malloc, 445 free, 0 free(NULL), 646 net
+After pagescan: 1108 malloc, 448 free, 0 free(NULL), 660 net
+After pagescan: 1123 malloc, 466 free, 0 free(NULL), 657 net
+After pagescan: 1127 malloc, 472 free, 0 free(NULL), 655 net
+After pagescan: 1129 malloc, 475 free, 0 free(NULL), 654 net
+After pagescan: 1131 malloc, 478 free, 0 free(NULL), 653 net
+After pagescan: 1133 malloc, 481 free, 0 free(NULL), 652 net
+After pagescan: 1141 malloc, 484 free, 0 free(NULL), 657 net
+After pagescan: 1158 malloc, 487 free, 0 free(NULL), 671 net
+After pagescan: 1173 malloc, 505 free, 0 free(NULL), 668 net
+After pagescan: 1177 malloc, 511 free, 0 free(NULL), 666 net
+After pagescan: 1179 malloc, 514 free, 0 free(NULL), 665 net
+After pagescan: 1196 malloc, 517 free, 0 free(NULL), 679 net
+After pagescan: 1198 malloc, 520 free, 0 free(NULL), 678 net
+After pagescan: 1200 malloc, 523 free, 0 free(NULL), 677 net
+After pagescan: 1202 malloc, 526 free, 0 free(NULL), 676 net
+After pagescan: 1204 malloc, 529 free, 0 free(NULL), 675 net
+After pagescan: 1206 malloc, 532 free, 0 free(NULL), 674 net
+After pagescan: 1208 malloc, 535 free, 0 free(NULL), 673 net
+After pagescan: 1225 malloc, 538 free, 0 free(NULL), 687 net
+After pagescan: 1227 malloc, 541 free, 0 free(NULL), 686 net
+After pagescan: 1229 malloc, 544 free, 0 free(NULL), 685 net
+After pagescan: 1231 malloc, 547 free, 0 free(NULL), 684 net
+After pagescan: 1233 malloc, 550 free, 0 free(NULL), 683 net
+After pagescan: 1235 malloc, 553 free, 0 free(NULL), 682 net
+After pagescan: 1237 malloc, 556 free, 0 free(NULL), 681 net
+After pagescan: 1269 malloc, 559 free, 0 free(NULL), 710 net
+After pagescan: 1271 malloc, 562 free, 0 free(NULL), 709 net
+After pagescan: 1273 malloc, 565 free, 0 free(NULL), 708 net
+After pagescan: 1275 malloc, 568 free, 0 free(NULL), 707 net
+After pagescan: 1277 malloc, 571 free, 0 free(NULL), 706 net
+After pagescan: 1282 malloc, 574 free, 0 free(NULL), 708 net
+After pagescan: 1289 malloc, 580 free, 0 free(NULL), 709 net
+After pagescan: 1296 malloc, 586 free, 0 free(NULL), 710 net
+After pagescan: 1303 malloc, 592 free, 0 free(NULL), 711 net
+After pagescan: 1310 malloc, 598 free, 0 free(NULL), 712 net
+After pagescan: 1317 malloc, 604 free, 0 free(NULL), 713 net
+After pagescan: 1321 malloc, 610 free, 0 free(NULL), 711 net
+After pagescan: 1380 malloc, 613 free, 0 free(NULL), 767 net
+After pagescan: 1415 malloc, 616 free, 0 free(NULL), 799 net
+After pagescan: 1439 malloc, 652 free, 0 free(NULL), 787 net
+After pagescan: 1441 malloc, 655 free, 0 free(NULL), 786 net
+After pagescan: 1443 malloc, 658 free, 0 free(NULL), 785 net
+After pagescan: 1445 malloc, 661 free, 0 free(NULL), 784 net
+After pagescan: 1447 malloc, 664 free, 0 free(NULL), 783 net
+After pagescan: 1449 malloc, 667 free, 0 free(NULL), 782 net
+After pagescan: 1451 malloc, 670 free, 0 free(NULL), 781 net
+After pagescan: 1453 malloc, 673 free, 0 free(NULL), 780 net
+After pagescan: 1455 malloc, 676 free, 0 free(NULL), 779 net
+After pagescan: 1457 malloc, 679 free, 0 free(NULL), 778 net
+After pagescan: 1459 malloc, 682 free, 0 free(NULL), 777 net
+After pagescan: 1461 malloc, 685 free, 0 free(NULL), 776 net
+After pagescan: 1463 malloc, 688 free, 0 free(NULL), 775 net
+After pagescan: 1465 malloc, 691 free, 0 free(NULL), 774 net
+After pagescan: 1467 malloc, 694 free, 0 free(NULL), 773 net
+After pagescan: 1469 malloc, 697 free, 0 free(NULL), 772 net
+After pagescan: 1471 malloc, 700 free, 0 free(NULL), 771 net
+After pagescan: 1473 malloc, 703 free, 0 free(NULL), 770 net
+After pagescan: 1505 malloc, 706 free, 0 free(NULL), 799 net
+After pagescan: 1507 malloc, 709 free, 0 free(NULL), 798 net
+After pagescan: 1509 malloc, 712 free, 0 free(NULL), 797 net
+After pagescan: 1511 malloc, 715 free, 0 free(NULL), 796 net
+After pagescan: 1513 malloc, 718 free, 0 free(NULL), 795 net
+After pagescan: 1515 malloc, 721 free, 0 free(NULL), 794 net
+After pagescan: 1520 malloc, 724 free, 0 free(NULL), 796 net
+After pagescan: 1527 malloc, 730 free, 0 free(NULL), 797 net
+After pagescan: 1534 malloc, 736 free, 0 free(NULL), 798 net
+After pagescan: 1541 malloc, 742 free, 0 free(NULL), 799 net
+After pagescan: 1548 malloc, 748 free, 0 free(NULL), 800 net
+After pagescan: 1588 malloc, 754 free, 0 free(NULL), 834 net
+After pagescan: 1590 malloc, 757 free, 0 free(NULL), 833 net
+After pagescan: 1592 malloc, 760 free, 0 free(NULL), 832 net
+After pagescan: 1594 malloc, 763 free, 0 free(NULL), 831 net
+After pagescan: 1596 malloc, 766 free, 0 free(NULL), 830 net
+After pagescan: 1598 malloc, 769 free, 0 free(NULL), 829 net
+After pagescan: 1600 malloc, 772 free, 0 free(NULL), 828 net
+After pagescan: 1605 malloc, 775 free, 0 free(NULL), 830 net
+After pagescan: 1612 malloc, 781 free, 0 free(NULL), 831 net
+After pagescan: 1619 malloc, 787 free, 0 free(NULL), 832 net
+After pagescan: 1626 malloc, 793 free, 0 free(NULL), 833 net
+After pagescan: 1633 malloc, 799 free, 0 free(NULL), 834 net
+After pagescan: 1640 malloc, 805 free, 0 free(NULL), 835 net
+After pagescan: 1656 malloc, 811 free, 0 free(NULL), 845 net
+After pagescan: 1667 malloc, 814 free, 0 free(NULL), 853 net
+After pagescan: 1678 malloc, 826 free, 0 free(NULL), 852 net
+After pagescan: 1685 malloc, 832 free, 0 free(NULL), 853 net
+After pagescan: 1692 malloc, 838 free, 0 free(NULL), 854 net
+After pagescan: 1696 malloc, 844 free, 0 free(NULL), 852 net
+After pagescan: 1698 malloc, 847 free, 0 free(NULL), 851 net
+After pagescan: 1715 malloc, 850 free, 0 free(NULL), 865 net
+After pagescan: 1723 malloc, 853 free, 0 free(NULL), 870 net
+After pagescan: 1732 malloc, 862 free, 0 free(NULL), 870 net
+After pagescan: 1739 malloc, 868 free, 0 free(NULL), 871 net
+After pagescan: 1746 malloc, 874 free, 0 free(NULL), 872 net
+After pagescan: 1753 malloc, 880 free, 0 free(NULL), 873 net
+After pagescan: 1760 malloc, 886 free, 0 free(NULL), 874 net
+After pagescan: 1780 malloc, 889 free, 0 free(NULL), 891 net
+After pagescan: 1797 malloc, 910 free, 0 free(NULL), 887 net
+After pagescan: 1799 malloc, 913 free, 0 free(NULL), 886 net
+After pagescan: 1801 malloc, 916 free, 0 free(NULL), 885 net
+After pagescan: 1824 malloc, 919 free, 0 free(NULL), 905 net
+After pagescan: 1826 malloc, 922 free, 0 free(NULL), 904 net
+After pagescan: 1828 malloc, 925 free, 0 free(NULL), 903 net
+After pagescan: 1830 malloc, 928 free, 0 free(NULL), 902 net
+After pagescan: 1832 malloc, 931 free, 0 free(NULL), 901 net
+After pagescan: 1834 malloc, 934 free, 0 free(NULL), 900 net
+After pagescan: 1836 malloc, 937 free, 0 free(NULL), 899 net
+After pagescan: 1838 malloc, 940 free, 0 free(NULL), 898 net
+After pagescan: 1864 malloc, 943 free, 0 free(NULL), 921 net
+After pagescan: 1866 malloc, 946 free, 0 free(NULL), 920 net
+After pagescan: 1868 malloc, 949 free, 0 free(NULL), 919 net
+After pagescan: 1873 malloc, 952 free, 0 free(NULL), 921 net
+After pagescan: 1880 malloc, 958 free, 0 free(NULL), 922 net
+After pagescan: 1887 malloc, 964 free, 0 free(NULL), 923 net
+After pagescan: 1894 malloc, 970 free, 0 free(NULL), 924 net
+After pagescan: 1901 malloc, 976 free, 0 free(NULL), 925 net
+After pagescan: 1908 malloc, 982 free, 0 free(NULL), 926 net
+After pagescan: 1948 malloc, 988 free, 0 free(NULL), 960 net
+After pagescan: 2016 malloc, 991 free, 0 free(NULL), 1025 net
+After pagescan: 2062 malloc, 1060 free, 0 free(NULL), 1002 net
+After pagescan: 2064 malloc, 1063 free, 0 free(NULL), 1001 net
+After pagescan: 2066 malloc, 1066 free, 0 free(NULL), 1000 net
+After pagescan: 2068 malloc, 1069 free, 0 free(NULL), 999 net
+After pagescan: 2070 malloc, 1072 free, 0 free(NULL), 998 net
+After pagescan: 2072 malloc, 1075 free, 0 free(NULL), 997 net
+After pagescan: 2077 malloc, 1078 free, 0 free(NULL), 999 net
+After pagescan: 2084 malloc, 1084 free, 0 free(NULL), 1000 net
+After pagescan: 2091 malloc, 1090 free, 0 free(NULL), 1001 net
+After pagescan: 2098 malloc, 1096 free, 0 free(NULL), 1002 net
+After pagescan: 2105 malloc, 1102 free, 0 free(NULL), 1003 net
+After pagescan: 2109 malloc, 1108 free, 0 free(NULL), 1001 net
+After pagescan: 2171 malloc, 1111 free, 0 free(NULL), 1060 net
+After pagescan: 2239 malloc, 1114 free, 0 free(NULL), 1125 net
+After pagescan: 2285 malloc, 1183 free, 0 free(NULL), 1102 net
+After pagescan: 2287 malloc, 1186 free, 0 free(NULL), 1101 net
+After pagescan: 2289 malloc, 1189 free, 0 free(NULL), 1100 net
+After pagescan: 2291 malloc, 1192 free, 0 free(NULL), 1099 net
+After pagescan: 2293 malloc, 1195 free, 0 free(NULL), 1098 net
+After pagescan: 2295 malloc, 1198 free, 0 free(NULL), 1097 net
+After pagescan: 2297 malloc, 1201 free, 0 free(NULL), 1096 net
+After pagescan: 2299 malloc, 1204 free, 0 free(NULL), 1095 net
+After pagescan: 2301 malloc, 1207 free, 0 free(NULL), 1094 net
+After pagescan: 2303 malloc, 1210 free, 0 free(NULL), 1093 net
+After pagescan: 2305 malloc, 1213 free, 0 free(NULL), 1092 net
+After pagescan: 2307 malloc, 1216 free, 0 free(NULL), 1091 net
+After pagescan: 2309 malloc, 1219 free, 0 free(NULL), 1090 net
+After pagescan: 2311 malloc, 1222 free, 0 free(NULL), 1089 net
+After pagescan: 2316 malloc, 1225 free, 0 free(NULL), 1091 net
+After pagescan: 2323 malloc, 1231 free, 0 free(NULL), 1092 net
+After pagescan: 2330 malloc, 1237 free, 0 free(NULL), 1093 net
+After pagescan: 2337 malloc, 1243 free, 0 free(NULL), 1094 net
+After pagescan: 2344 malloc, 1249 free, 0 free(NULL), 1095 net
+After pagescan: 2393 malloc, 1255 free, 0 free(NULL), 1138 net
+After pagescan: 2461 malloc, 1258 free, 0 free(NULL), 1203 net
+After pagescan: 2507 malloc, 1327 free, 0 free(NULL), 1180 net
+After pagescan: 2509 malloc, 1330 free, 0 free(NULL), 1179 net
+After pagescan: 2511 malloc, 1333 free, 0 free(NULL), 1178 net
+After pagescan: 2513 malloc, 1336 free, 0 free(NULL), 1177 net
+After pagescan: 2515 malloc, 1339 free, 0 free(NULL), 1176 net
+After pagescan: 2517 malloc, 1342 free, 0 free(NULL), 1175 net
+After pagescan: 2519 malloc, 1345 free, 0 free(NULL), 1174 net
+After pagescan: 2521 malloc, 1348 free, 0 free(NULL), 1173 net
+After pagescan: 2523 malloc, 1351 free, 0 free(NULL), 1172 net
+After pagescan: 2528 malloc, 1354 free, 0 free(NULL), 1174 net
+After pagescan: 2535 malloc, 1360 free, 0 free(NULL), 1175 net
+After pagescan: 2542 malloc, 1366 free, 0 free(NULL), 1176 net
+After pagescan: 2549 malloc, 1372 free, 0 free(NULL), 1177 net
+After pagescan: 2556 malloc, 1378 free, 0 free(NULL), 1178 net
+After pagescan: 2560 malloc, 1384 free, 0 free(NULL), 1176 net
+After pagescan: 2607 malloc, 1387 free, 0 free(NULL), 1220 net
+After pagescan: 2609 malloc, 1390 free, 0 free(NULL), 1219 net
+After pagescan: 2611 malloc, 1393 free, 0 free(NULL), 1218 net
+After pagescan: 2613 malloc, 1396 free, 0 free(NULL), 1217 net
+After pagescan: 2615 malloc, 1399 free, 0 free(NULL), 1216 net
+After pagescan: 2617 malloc, 1402 free, 0 free(NULL), 1215 net
+After pagescan: 2619 malloc, 1405 free, 0 free(NULL), 1214 net
+After pagescan: 2621 malloc, 1408 free, 0 free(NULL), 1213 net
+After pagescan: 2623 malloc, 1411 free, 0 free(NULL), 1212 net
+After pagescan: 2625 malloc, 1414 free, 0 free(NULL), 1211 net
+After pagescan: 2630 malloc, 1417 free, 0 free(NULL), 1213 net
+After pagescan: 2637 malloc, 1423 free, 0 free(NULL), 1214 net
+After pagescan: 2644 malloc, 1429 free, 0 free(NULL), 1215 net
+After pagescan: 2651 malloc, 1435 free, 0 free(NULL), 1216 net
+After pagescan: 2658 malloc, 1441 free, 0 free(NULL), 1217 net
+After pagescan: 2665 malloc, 1447 free, 0 free(NULL), 1218 net
+After pagescan: 2693 malloc, 1453 free, 0 free(NULL), 1240 net
+After pagescan: 2761 malloc, 1456 free, 0 free(NULL), 1305 net
+After pagescan: 2807 malloc, 1525 free, 0 free(NULL), 1282 net
+After pagescan: 2809 malloc, 1528 free, 0 free(NULL), 1281 net
+After pagescan: 2811 malloc, 1531 free, 0 free(NULL), 1280 net
+After pagescan: 2813 malloc, 1534 free, 0 free(NULL), 1279 net
+After pagescan: 2815 malloc, 1537 free, 0 free(NULL), 1278 net
+After pagescan: 2817 malloc, 1540 free, 0 free(NULL), 1277 net
+After pagescan: 2819 malloc, 1543 free, 0 free(NULL), 1276 net
+After pagescan: 2833 malloc, 1546 free, 0 free(NULL), 1287 net
+After pagescan: 2835 malloc, 1549 free, 0 free(NULL), 1286 net
+After pagescan: 2837 malloc, 1552 free, 0 free(NULL), 1285 net
+After pagescan: 2839 malloc, 1555 free, 0 free(NULL), 1284 net
+After pagescan: 2841 malloc, 1558 free, 0 free(NULL), 1283 net
+After pagescan: 2870 malloc, 1561 free, 0 free(NULL), 1309 net
+After pagescan: 2938 malloc, 1564 free, 0 free(NULL), 1374 net
+After pagescan: 2984 malloc, 1633 free, 0 free(NULL), 1351 net
+After pagescan: 2986 malloc, 1636 free, 0 free(NULL), 1350 net
+After pagescan: 2988 malloc, 1639 free, 0 free(NULL), 1349 net
+After pagescan: 2990 malloc, 1642 free, 0 free(NULL), 1348 net
+After pagescan: 2992 malloc, 1645 free, 0 free(NULL), 1347 net
+After pagescan: 2994 malloc, 1648 free, 0 free(NULL), 1346 net
+After pagescan: 2996 malloc, 1651 free, 0 free(NULL), 1345 net
+After pagescan: 2998 malloc, 1654 free, 0 free(NULL), 1344 net
+After pagescan: 3003 malloc, 1657 free, 0 free(NULL), 1346 net
+After pagescan: 3023 malloc, 1660 free, 0 free(NULL), 1363 net
+After pagescan: 3073 malloc, 1681 free, 0 free(NULL), 1392 net
+After pagescan: 3105 malloc, 1684 free, 0 free(NULL), 1421 net
+After pagescan: 3127 malloc, 1717 free, 0 free(NULL), 1410 net
+After pagescan: 3129 malloc, 1720 free, 0 free(NULL), 1409 net
+After pagescan: 3131 malloc, 1723 free, 0 free(NULL), 1408 net
+After pagescan: 3133 malloc, 1726 free, 0 free(NULL), 1407 net
+After pagescan: 3135 malloc, 1729 free, 0 free(NULL), 1406 net
+After pagescan: 3137 malloc, 1732 free, 0 free(NULL), 1405 net
+After pagescan: 3139 malloc, 1735 free, 0 free(NULL), 1404 net
+After pagescan: 3141 malloc, 1738 free, 0 free(NULL), 1403 net
+After pagescan: 3143 malloc, 1741 free, 0 free(NULL), 1402 net
+After pagescan: 3145 malloc, 1744 free, 0 free(NULL), 1401 net
+After pagescan: 3147 malloc, 1747 free, 0 free(NULL), 1400 net
+After pagescan: 3182 malloc, 1750 free, 0 free(NULL), 1432 net
+After pagescan: 3250 malloc, 1753 free, 0 free(NULL), 1497 net
+After pagescan: 3296 malloc, 1822 free, 0 free(NULL), 1474 net
+After pagescan: 3298 malloc, 1825 free, 0 free(NULL), 1473 net
+After pagescan: 3300 malloc, 1828 free, 0 free(NULL), 1472 net
+After pagescan: 3302 malloc, 1831 free, 0 free(NULL), 1471 net
+After pagescan: 3304 malloc, 1834 free, 0 free(NULL), 1470 net
+After pagescan: 3306 malloc, 1837 free, 0 free(NULL), 1469 net
+After pagescan: 3308 malloc, 1840 free, 0 free(NULL), 1468 net
+After pagescan: 3313 malloc, 1843 free, 0 free(NULL), 1470 net
+After pagescan: 3320 malloc, 1849 free, 0 free(NULL), 1471 net
+After pagescan: 3327 malloc, 1855 free, 0 free(NULL), 1472 net
+After pagescan: 3373 malloc, 1861 free, 0 free(NULL), 1512 net
+After pagescan: 3375 malloc, 1864 free, 0 free(NULL), 1511 net
+After pagescan: 3377 malloc, 1867 free, 0 free(NULL), 1510 net
+After pagescan: 3379 malloc, 1870 free, 0 free(NULL), 1509 net
+After pagescan: 3381 malloc, 1873 free, 0 free(NULL), 1508 net
+After pagescan: 3383 malloc, 1876 free, 0 free(NULL), 1507 net
+After pagescan: 3385 malloc, 1879 free, 0 free(NULL), 1506 net
+After pagescan: 3387 malloc, 1882 free, 0 free(NULL), 1505 net
+After pagescan: 3389 malloc, 1885 free, 0 free(NULL), 1504 net
+After pagescan: 3394 malloc, 1888 free, 0 free(NULL), 1506 net
+After pagescan: 3401 malloc, 1894 free, 0 free(NULL), 1507 net
+After pagescan: 3408 malloc, 1900 free, 0 free(NULL), 1508 net
+After pagescan: 3415 malloc, 1906 free, 0 free(NULL), 1509 net
+After pagescan: 3422 malloc, 1912 free, 0 free(NULL), 1510 net
+After pagescan: 3429 malloc, 1918 free, 0 free(NULL), 1511 net
+After pagescan: 3472 malloc, 1924 free, 0 free(NULL), 1548 net
+After pagescan: 3522 malloc, 1927 free, 0 free(NULL), 1595 net
+After pagescan: 3556 malloc, 1978 free, 0 free(NULL), 1578 net
+After pagescan: 3558 malloc, 1981 free, 0 free(NULL), 1577 net
+After pagescan: 3560 malloc, 1984 free, 0 free(NULL), 1576 net
+After pagescan: 3562 malloc, 1987 free, 0 free(NULL), 1575 net
+After pagescan: 3564 malloc, 1990 free, 0 free(NULL), 1574 net
+After pagescan: 3566 malloc, 1993 free, 0 free(NULL), 1573 net
+After pagescan: 3568 malloc, 1996 free, 0 free(NULL), 1572 net
+After pagescan: 3570 malloc, 1999 free, 0 free(NULL), 1571 net
+After pagescan: 3572 malloc, 2002 free, 0 free(NULL), 1570 net
+After pagescan: 3574 malloc, 2005 free, 0 free(NULL), 1569 net
+After pagescan: 3576 malloc, 2008 free, 0 free(NULL), 1568 net
+After pagescan: 3578 malloc, 2011 free, 0 free(NULL), 1567 net
+After pagescan: 3592 malloc, 2014 free, 0 free(NULL), 1578 net
+After pagescan: 3594 malloc, 2017 free, 0 free(NULL), 1577 net
+After pagescan: 3596 malloc, 2020 free, 0 free(NULL), 1576 net
+After pagescan: 3598 malloc, 2023 free, 0 free(NULL), 1575 net
+After pagescan: 3600 malloc, 2026 free, 0 free(NULL), 1574 net
+After pagescan: 3641 malloc, 2029 free, 0 free(NULL), 1612 net
+After pagescan: 3643 malloc, 2032 free, 0 free(NULL), 1611 net
+After pagescan: 3645 malloc, 2035 free, 0 free(NULL), 1610 net
+After pagescan: 3647 malloc, 2038 free, 0 free(NULL), 1609 net
+After pagescan: 3649 malloc, 2041 free, 0 free(NULL), 1608 net
+After pagescan: 3651 malloc, 2044 free, 0 free(NULL), 1607 net
+After pagescan: 3653 malloc, 2047 free, 0 free(NULL), 1606 net
+After pagescan: 3655 malloc, 2050 free, 0 free(NULL), 1605 net
+After pagescan: 3660 malloc, 2053 free, 0 free(NULL), 1607 net
+After pagescan: 3667 malloc, 2059 free, 0 free(NULL), 1608 net
+After pagescan: 3674 malloc, 2065 free, 0 free(NULL), 1609 net
+After pagescan: 3681 malloc, 2071 free, 0 free(NULL), 1610 net
+After pagescan: 3688 malloc, 2077 free, 0 free(NULL), 1611 net
+After pagescan: 3695 malloc, 2083 free, 0 free(NULL), 1612 net
+After pagescan: 3735 malloc, 2089 free, 0 free(NULL), 1646 net
+After pagescan: 3803 malloc, 2092 free, 0 free(NULL), 1711 net
+After pagescan: 3849 malloc, 2161 free, 0 free(NULL), 1688 net
+After pagescan: 3851 malloc, 2164 free, 0 free(NULL), 1687 net
+After pagescan: 3853 malloc, 2167 free, 0 free(NULL), 1686 net
+After pagescan: 3855 malloc, 2170 free, 0 free(NULL), 1685 net
+After pagescan: 3857 malloc, 2173 free, 0 free(NULL), 1684 net
+After pagescan: 3859 malloc, 2176 free, 0 free(NULL), 1683 net
+After pagescan: 3861 malloc, 2179 free, 0 free(NULL), 1682 net
+After pagescan: 3866 malloc, 2182 free, 0 free(NULL), 1684 net
+After pagescan: 3873 malloc, 2188 free, 0 free(NULL), 1685 net
+After pagescan: 3880 malloc, 2194 free, 0 free(NULL), 1686 net
+After pagescan: 3887 malloc, 2200 free, 0 free(NULL), 1687 net
+After pagescan: 3939 malloc, 2206 free, 0 free(NULL), 1733 net
+After pagescan: 3962 malloc, 2209 free, 0 free(NULL), 1753 net
+After pagescan: 3978 malloc, 2233 free, 0 free(NULL), 1745 net
+After pagescan: 3980 malloc, 2236 free, 0 free(NULL), 1744 net
+After pagescan: 3982 malloc, 2239 free, 0 free(NULL), 1743 net
+After pagescan: 3984 malloc, 2242 free, 0 free(NULL), 1742 net
+After pagescan: 3986 malloc, 2245 free, 0 free(NULL), 1741 net
+After pagescan: 3988 malloc, 2248 free, 0 free(NULL), 1740 net
+After pagescan: 3990 malloc, 2251 free, 0 free(NULL), 1739 net
+After pagescan: 3992 malloc, 2254 free, 0 free(NULL), 1738 net
+After pagescan: 3994 malloc, 2257 free, 0 free(NULL), 1737 net
+After pagescan: 3999 malloc, 2260 free, 0 free(NULL), 1739 net
+After pagescan: 4006 malloc, 2266 free, 0 free(NULL), 1740 net
+After pagescan: 4013 malloc, 2272 free, 0 free(NULL), 1741 net
+After pagescan: 4020 malloc, 2278 free, 0 free(NULL), 1742 net
+After pagescan: 4027 malloc, 2284 free, 0 free(NULL), 1743 net
+After pagescan: 4034 malloc, 2290 free, 0 free(NULL), 1744 net
+After pagescan: 4074 malloc, 2296 free, 0 free(NULL), 1778 net
+After pagescan: 4115 malloc, 2299 free, 0 free(NULL), 1816 net
+After pagescan: 4143 malloc, 2341 free, 0 free(NULL), 1802 net
+After pagescan: 4145 malloc, 2344 free, 0 free(NULL), 1801 net
+After pagescan: 4147 malloc, 2347 free, 0 free(NULL), 1800 net
+After pagescan: 4149 malloc, 2350 free, 0 free(NULL), 1799 net
+After pagescan: 4151 malloc, 2353 free, 0 free(NULL), 1798 net
+After pagescan: 4153 malloc, 2356 free, 0 free(NULL), 1797 net
+After pagescan: 4155 malloc, 2359 free, 0 free(NULL), 1796 net
+After pagescan: 4157 malloc, 2362 free, 0 free(NULL), 1795 net
+After pagescan: 4159 malloc, 2365 free, 0 free(NULL), 1794 net
+After pagescan: 4161 malloc, 2368 free, 0 free(NULL), 1793 net
+After pagescan: 4163 malloc, 2371 free, 0 free(NULL), 1792 net
+After pagescan: 4177 malloc, 2374 free, 0 free(NULL), 1803 net
+After pagescan: 4179 malloc, 2377 free, 0 free(NULL), 1802 net
+After pagescan: 4181 malloc, 2380 free, 0 free(NULL), 1801 net
+After pagescan: 4183 malloc, 2383 free, 0 free(NULL), 1800 net
+After pagescan: 4185 malloc, 2386 free, 0 free(NULL), 1799 net
+After pagescan: 4190 malloc, 2389 free, 0 free(NULL), 1801 net
+After pagescan: 4198 malloc, 2392 free, 0 free(NULL), 1806 net
+After pagescan: 4204 malloc, 2401 free, 0 free(NULL), 1803 net
+After crawl: 4204 malloc, 4204 free, 0 free(NULL), 0 net
+At end of Main: 4204 malloc, 4204 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0
+# wikipedia at depth 0, 1 and 2 
+./crawler http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ ../data/wikipedia-0 0
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After crawl: 209 malloc, 209 free, 0 free(NULL), 0 net
+At end of Main: 209 malloc, 209 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ ../data/wikipedia-1 1
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 227 malloc, 4 free, 0 free(NULL), 223 net
+After crawl: 239 malloc, 239 free, 0 free(NULL), 0 net
+At end of Main: 239 malloc, 239 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0./crawler http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ ../data/wikipedia-2 2
+After parseArgs: 1 malloc, 1 free, 0 free(NULL), 0 net
+After pagescan: 227 malloc, 4 free, 0 free(NULL), 223 net
+After pagescan: 604 malloc, 7 free, 0 free(NULL), 597 net
+After pagescan: 1111 malloc, 385 free, 0 free(NULL), 726 net
+After pagescan: 2566 malloc, 639 free, 0 free(NULL), 1927 net
+After pagescan: 4683 malloc, 1875 free, 0 free(NULL), 2808 net
+After pagescan: 6495 malloc, 3189 free, 0 free(NULL), 3306 net
+After pagescan: 8052 malloc, 4126 free, 0 free(NULL), 3926 net
+After crawl: 8672 malloc, 8672 free, 0 free(NULL), 0 net
+At end of Main: 8672 malloc, 8672 free, 0 free(NULL), 0 net
+
+Net malloc-free counts (should be zero): 0
+diff -r ../data ../data-1 || exit 0
+Only in ../data/letters-0: .crawler
+Only in ../data/letters-0: 1
+Only in ../data/letters-1: .crawler
+Only in ../data/letters-1: 1
+Only in ../data/letters-1: 2
+Only in ../data/letters-10: .crawler
+Only in ../data/letters-10: 1
+Only in ../data/letters-10: 2
+Only in ../data/letters-10: 3
+Only in ../data/letters-10: 4
+Only in ../data/letters-10: 5
+Only in ../data/letters-10: 6
+Only in ../data/letters-10: 7
+Only in ../data/letters-10: 8
+Only in ../data/letters-10: 9
+Only in ../data/letters-2: .crawler
+Only in ../data/letters-2: 1
+Only in ../data/letters-2: 2
+Only in ../data/letters-2: 3
+Only in ../data/toscrape-0: .crawler
+Only in ../data/toscrape-0: 1
+Only in ../data/toscrape-1: .crawler
+Only in ../data/toscrape-1: 1
+Only in ../data/toscrape-1: 10
+Only in ../data/toscrape-1: 11
+Only in ../data/toscrape-1: 12
+Only in ../data/toscrape-1: 13
+Only in ../data/toscrape-1: 14
+Only in ../data/toscrape-1: 15
+Only in ../data/toscrape-1: 16
+Only in ../data/toscrape-1: 17
+Only in ../data/toscrape-1: 18
+Only in ../data/toscrape-1: 19
+Only in ../data/toscrape-1: 2
+Only in ../data/toscrape-1: 20
+Only in ../data/toscrape-1: 21
+Only in ../data/toscrape-1: 22
+Only in ../data/toscrape-1: 23
+Only in ../data/toscrape-1: 24
+Only in ../data/toscrape-1: 25
+Only in ../data/toscrape-1: 26
+Only in ../data/toscrape-1: 27
+Only in ../data/toscrape-1: 28
+Only in ../data/toscrape-1: 29
+Only in ../data/toscrape-1: 3
+Only in ../data/toscrape-1: 30
+Only in ../data/toscrape-1: 31
+Only in ../data/toscrape-1: 32
+Only in ../data/toscrape-1: 33
+Only in ../data/toscrape-1: 34
+Only in ../data/toscrape-1: 35
+Only in ../data/toscrape-1: 36
+Only in ../data/toscrape-1: 37
+Only in ../data/toscrape-1: 38
+Only in ../data/toscrape-1: 39
+Only in ../data/toscrape-1: 4
+Only in ../data/toscrape-1: 40
+Only in ../data/toscrape-1: 41
+Only in ../data/toscrape-1: 42
+Only in ../data/toscrape-1: 43
+Only in ../data/toscrape-1: 44
+Only in ../data/toscrape-1: 45
+Only in ../data/toscrape-1: 46
+Only in ../data/toscrape-1: 47
+Only in ../data/toscrape-1: 48
+Only in ../data/toscrape-1: 49
+Only in ../data/toscrape-1: 5
+Only in ../data/toscrape-1: 50
+Only in ../data/toscrape-1: 51
+Only in ../data/toscrape-1: 52
+Only in ../data/toscrape-1: 53
+Only in ../data/toscrape-1: 54
+Only in ../data/toscrape-1: 55
+Only in ../data/toscrape-1: 56
+Only in ../data/toscrape-1: 57
+Only in ../data/toscrape-1: 58
+Only in ../data/toscrape-1: 59
+Only in ../data/toscrape-1: 6
+Only in ../data/toscrape-1: 60
+Only in ../data/toscrape-1: 61
+Only in ../data/toscrape-1: 62
+Only in ../data/toscrape-1: 63
+Only in ../data/toscrape-1: 64
+Only in ../data/toscrape-1: 65
+Only in ../data/toscrape-1: 66
+Only in ../data/toscrape-1: 67
+Only in ../data/toscrape-1: 68
+Only in ../data/toscrape-1: 69
+Only in ../data/toscrape-1: 7
+Only in ../data/toscrape-1: 70
+Only in ../data/toscrape-1: 71
+Only in ../data/toscrape-1: 72
+Only in ../data/toscrape-1: 73
+Only in ../data/toscrape-1: 74
+Only in ../data/toscrape-1: 8
+Only in ../data/toscrape-1: 9
+Only in ../data/toscrape-2: .crawler
+Only in ../data/toscrape-2: 1
+Only in ../data/toscrape-2: 10
+Only in ../data/toscrape-2: 100
+Only in ../data/toscrape-2: 101
+Only in ../data/toscrape-2: 102
+Only in ../data/toscrape-2: 103
+Only in ../data/toscrape-2: 104
+Only in ../data/toscrape-2: 105
+Only in ../data/toscrape-2: 106
+Only in ../data/toscrape-2: 107
+Only in ../data/toscrape-2: 108
+Only in ../data/toscrape-2: 109
+Only in ../data/toscrape-2: 11
+Only in ../data/toscrape-2: 110
+Only in ../data/toscrape-2: 111
+Only in ../data/toscrape-2: 112
+Only in ../data/toscrape-2: 113
+Only in ../data/toscrape-2: 114
+Only in ../data/toscrape-2: 115
+Only in ../data/toscrape-2: 116
+Only in ../data/toscrape-2: 117
+Only in ../data/toscrape-2: 118
+Only in ../data/toscrape-2: 119
+Only in ../data/toscrape-2: 12
+Only in ../data/toscrape-2: 120
+Only in ../data/toscrape-2: 121
+Only in ../data/toscrape-2: 122
+Only in ../data/toscrape-2: 123
+Only in ../data/toscrape-2: 124
+Only in ../data/toscrape-2: 125
+Only in ../data/toscrape-2: 126
+Only in ../data/toscrape-2: 127
+Only in ../data/toscrape-2: 128
+Only in ../data/toscrape-2: 129
+Only in ../data/toscrape-2: 13
+Only in ../data/toscrape-2: 130
+Only in ../data/toscrape-2: 131
+Only in ../data/toscrape-2: 132
+Only in ../data/toscrape-2: 133
+Only in ../data/toscrape-2: 134
+Only in ../data/toscrape-2: 135
+Only in ../data/toscrape-2: 136
+Only in ../data/toscrape-2: 137
+Only in ../data/toscrape-2: 138
+Only in ../data/toscrape-2: 139
+Only in ../data/toscrape-2: 14
+Only in ../data/toscrape-2: 140
+Only in ../data/toscrape-2: 141
+Only in ../data/toscrape-2: 142
+Only in ../data/toscrape-2: 143
+Only in ../data/toscrape-2: 144
+Only in ../data/toscrape-2: 145
+Only in ../data/toscrape-2: 146
+Only in ../data/toscrape-2: 147
+Only in ../data/toscrape-2: 148
+Only in ../data/toscrape-2: 149
+Only in ../data/toscrape-2: 15
+Only in ../data/toscrape-2: 150
+Only in ../data/toscrape-2: 151
+Only in ../data/toscrape-2: 152
+Only in ../data/toscrape-2: 153
+Only in ../data/toscrape-2: 154
+Only in ../data/toscrape-2: 155
+Only in ../data/toscrape-2: 156
+Only in ../data/toscrape-2: 157
+Only in ../data/toscrape-2: 158
+Only in ../data/toscrape-2: 159
+Only in ../data/toscrape-2: 16
+Only in ../data/toscrape-2: 160
+Only in ../data/toscrape-2: 161
+Only in ../data/toscrape-2: 162
+Only in ../data/toscrape-2: 163
+Only in ../data/toscrape-2: 164
+Only in ../data/toscrape-2: 165
+Only in ../data/toscrape-2: 166
+Only in ../data/toscrape-2: 167
+Only in ../data/toscrape-2: 168
+Only in ../data/toscrape-2: 169
+Only in ../data/toscrape-2: 17
+Only in ../data/toscrape-2: 170
+Only in ../data/toscrape-2: 171
+Only in ../data/toscrape-2: 172
+Only in ../data/toscrape-2: 173
+Only in ../data/toscrape-2: 174
+Only in ../data/toscrape-2: 175
+Only in ../data/toscrape-2: 176
+Only in ../data/toscrape-2: 177
+Only in ../data/toscrape-2: 178
+Only in ../data/toscrape-2: 179
+Only in ../data/toscrape-2: 18
+Only in ../data/toscrape-2: 180
+Only in ../data/toscrape-2: 181
+Only in ../data/toscrape-2: 182
+Only in ../data/toscrape-2: 183
+Only in ../data/toscrape-2: 184
+Only in ../data/toscrape-2: 185
+Only in ../data/toscrape-2: 186
+Only in ../data/toscrape-2: 187
+Only in ../data/toscrape-2: 188
+Only in ../data/toscrape-2: 189
+Only in ../data/toscrape-2: 19
+Only in ../data/toscrape-2: 190
+Only in ../data/toscrape-2: 191
+Only in ../data/toscrape-2: 192
+Only in ../data/toscrape-2: 193
+Only in ../data/toscrape-2: 194
+Only in ../data/toscrape-2: 195
+Only in ../data/toscrape-2: 196
+Only in ../data/toscrape-2: 197
+Only in ../data/toscrape-2: 198
+Only in ../data/toscrape-2: 199
+Only in ../data/toscrape-2: 2
+Only in ../data/toscrape-2: 20
+Only in ../data/toscrape-2: 200
+Only in ../data/toscrape-2: 201
+Only in ../data/toscrape-2: 202
+Only in ../data/toscrape-2: 203
+Only in ../data/toscrape-2: 204
+Only in ../data/toscrape-2: 205
+Only in ../data/toscrape-2: 206
+Only in ../data/toscrape-2: 207
+Only in ../data/toscrape-2: 208
+Only in ../data/toscrape-2: 209
+Only in ../data/toscrape-2: 21
+Only in ../data/toscrape-2: 210
+Only in ../data/toscrape-2: 211
+Only in ../data/toscrape-2: 212
+Only in ../data/toscrape-2: 213
+Only in ../data/toscrape-2: 214
+Only in ../data/toscrape-2: 215
+Only in ../data/toscrape-2: 216
+Only in ../data/toscrape-2: 217
+Only in ../data/toscrape-2: 218
+Only in ../data/toscrape-2: 219
+Only in ../data/toscrape-2: 22
+Only in ../data/toscrape-2: 220
+Only in ../data/toscrape-2: 221
+Only in ../data/toscrape-2: 222
+Only in ../data/toscrape-2: 223
+Only in ../data/toscrape-2: 224
+Only in ../data/toscrape-2: 225
+Only in ../data/toscrape-2: 226
+Only in ../data/toscrape-2: 227
+Only in ../data/toscrape-2: 228
+Only in ../data/toscrape-2: 229
+Only in ../data/toscrape-2: 23
+Only in ../data/toscrape-2: 230
+Only in ../data/toscrape-2: 231
+Only in ../data/toscrape-2: 232
+Only in ../data/toscrape-2: 233
+Only in ../data/toscrape-2: 234
+Only in ../data/toscrape-2: 235
+Only in ../data/toscrape-2: 236
+Only in ../data/toscrape-2: 237
+Only in ../data/toscrape-2: 238
+Only in ../data/toscrape-2: 239
+Only in ../data/toscrape-2: 24
+Only in ../data/toscrape-2: 240
+Only in ../data/toscrape-2: 241
+Only in ../data/toscrape-2: 242
+Only in ../data/toscrape-2: 243
+Only in ../data/toscrape-2: 244
+Only in ../data/toscrape-2: 245
+Only in ../data/toscrape-2: 246
+Only in ../data/toscrape-2: 247
+Only in ../data/toscrape-2: 248
+Only in ../data/toscrape-2: 249
+Only in ../data/toscrape-2: 25
+Only in ../data/toscrape-2: 250
+Only in ../data/toscrape-2: 251
+Only in ../data/toscrape-2: 252
+Only in ../data/toscrape-2: 253
+Only in ../data/toscrape-2: 254
+Only in ../data/toscrape-2: 255
+Only in ../data/toscrape-2: 256
+Only in ../data/toscrape-2: 257
+Only in ../data/toscrape-2: 258
+Only in ../data/toscrape-2: 259
+Only in ../data/toscrape-2: 26
+Only in ../data/toscrape-2: 260
+Only in ../data/toscrape-2: 261
+Only in ../data/toscrape-2: 262
+Only in ../data/toscrape-2: 263
+Only in ../data/toscrape-2: 264
+Only in ../data/toscrape-2: 265
+Only in ../data/toscrape-2: 266
+Only in ../data/toscrape-2: 267
+Only in ../data/toscrape-2: 268
+Only in ../data/toscrape-2: 269
+Only in ../data/toscrape-2: 27
+Only in ../data/toscrape-2: 270
+Only in ../data/toscrape-2: 271
+Only in ../data/toscrape-2: 272
+Only in ../data/toscrape-2: 273
+Only in ../data/toscrape-2: 274
+Only in ../data/toscrape-2: 275
+Only in ../data/toscrape-2: 276
+Only in ../data/toscrape-2: 277
+Only in ../data/toscrape-2: 278
+Only in ../data/toscrape-2: 279
+Only in ../data/toscrape-2: 28
+Only in ../data/toscrape-2: 280
+Only in ../data/toscrape-2: 281
+Only in ../data/toscrape-2: 282
+Only in ../data/toscrape-2: 283
+Only in ../data/toscrape-2: 284
+Only in ../data/toscrape-2: 285
+Only in ../data/toscrape-2: 286
+Only in ../data/toscrape-2: 287
+Only in ../data/toscrape-2: 288
+Only in ../data/toscrape-2: 289
+Only in ../data/toscrape-2: 29
+Only in ../data/toscrape-2: 290
+Only in ../data/toscrape-2: 291
+Only in ../data/toscrape-2: 292
+Only in ../data/toscrape-2: 293
+Only in ../data/toscrape-2: 294
+Only in ../data/toscrape-2: 295
+Only in ../data/toscrape-2: 296
+Only in ../data/toscrape-2: 297
+Only in ../data/toscrape-2: 298
+Only in ../data/toscrape-2: 299
+Only in ../data/toscrape-2: 3
+Only in ../data/toscrape-2: 30
+Only in ../data/toscrape-2: 300
+Only in ../data/toscrape-2: 301
+Only in ../data/toscrape-2: 302
+Only in ../data/toscrape-2: 303
+Only in ../data/toscrape-2: 304
+Only in ../data/toscrape-2: 305
+Only in ../data/toscrape-2: 306
+Only in ../data/toscrape-2: 307
+Only in ../data/toscrape-2: 308
+Only in ../data/toscrape-2: 309
+Only in ../data/toscrape-2: 31
+Only in ../data/toscrape-2: 310
+Only in ../data/toscrape-2: 311
+Only in ../data/toscrape-2: 312
+Only in ../data/toscrape-2: 313
+Only in ../data/toscrape-2: 314
+Only in ../data/toscrape-2: 315
+Only in ../data/toscrape-2: 316
+Only in ../data/toscrape-2: 317
+Only in ../data/toscrape-2: 318
+Only in ../data/toscrape-2: 319
+Only in ../data/toscrape-2: 32
+Only in ../data/toscrape-2: 320
+Only in ../data/toscrape-2: 321
+Only in ../data/toscrape-2: 322
+Only in ../data/toscrape-2: 323
+Only in ../data/toscrape-2: 324
+Only in ../data/toscrape-2: 325
+Only in ../data/toscrape-2: 326
+Only in ../data/toscrape-2: 327
+Only in ../data/toscrape-2: 328
+Only in ../data/toscrape-2: 329
+Only in ../data/toscrape-2: 33
+Only in ../data/toscrape-2: 330
+Only in ../data/toscrape-2: 331
+Only in ../data/toscrape-2: 332
+Only in ../data/toscrape-2: 333
+Only in ../data/toscrape-2: 334
+Only in ../data/toscrape-2: 335
+Only in ../data/toscrape-2: 336
+Only in ../data/toscrape-2: 337
+Only in ../data/toscrape-2: 338
+Only in ../data/toscrape-2: 339
+Only in ../data/toscrape-2: 34
+Only in ../data/toscrape-2: 340
+Only in ../data/toscrape-2: 341
+Only in ../data/toscrape-2: 342
+Only in ../data/toscrape-2: 343
+Only in ../data/toscrape-2: 344
+Only in ../data/toscrape-2: 345
+Only in ../data/toscrape-2: 346
+Only in ../data/toscrape-2: 347
+Only in ../data/toscrape-2: 348
+Only in ../data/toscrape-2: 349
+Only in ../data/toscrape-2: 35
+Only in ../data/toscrape-2: 350
+Only in ../data/toscrape-2: 351
+Only in ../data/toscrape-2: 352
+Only in ../data/toscrape-2: 353
+Only in ../data/toscrape-2: 354
+Only in ../data/toscrape-2: 355
+Only in ../data/toscrape-2: 356
+Only in ../data/toscrape-2: 357
+Only in ../data/toscrape-2: 358
+Only in ../data/toscrape-2: 359
+Only in ../data/toscrape-2: 36
+Only in ../data/toscrape-2: 360
+Only in ../data/toscrape-2: 361
+Only in ../data/toscrape-2: 362
+Only in ../data/toscrape-2: 363
+Only in ../data/toscrape-2: 364
+Only in ../data/toscrape-2: 365
+Only in ../data/toscrape-2: 366
+Only in ../data/toscrape-2: 367
+Only in ../data/toscrape-2: 368
+Only in ../data/toscrape-2: 369
+Only in ../data/toscrape-2: 37
+Only in ../data/toscrape-2: 370
+Only in ../data/toscrape-2: 371
+Only in ../data/toscrape-2: 372
+Only in ../data/toscrape-2: 373
+Only in ../data/toscrape-2: 374
+Only in ../data/toscrape-2: 375
+Only in ../data/toscrape-2: 376
+Only in ../data/toscrape-2: 377
+Only in ../data/toscrape-2: 378
+Only in ../data/toscrape-2: 379
+Only in ../data/toscrape-2: 38
+Only in ../data/toscrape-2: 380
+Only in ../data/toscrape-2: 381
+Only in ../data/toscrape-2: 382
+Only in ../data/toscrape-2: 383
+Only in ../data/toscrape-2: 384
+Only in ../data/toscrape-2: 385
+Only in ../data/toscrape-2: 386
+Only in ../data/toscrape-2: 387
+Only in ../data/toscrape-2: 388
+Only in ../data/toscrape-2: 389
+Only in ../data/toscrape-2: 39
+Only in ../data/toscrape-2: 390
+Only in ../data/toscrape-2: 391
+Only in ../data/toscrape-2: 392
+Only in ../data/toscrape-2: 393
+Only in ../data/toscrape-2: 394
+Only in ../data/toscrape-2: 395
+Only in ../data/toscrape-2: 396
+Only in ../data/toscrape-2: 397
+Only in ../data/toscrape-2: 398
+Only in ../data/toscrape-2: 399
+Only in ../data/toscrape-2: 4
+Only in ../data/toscrape-2: 40
+Only in ../data/toscrape-2: 400
+Only in ../data/toscrape-2: 401
+Only in ../data/toscrape-2: 402
+Only in ../data/toscrape-2: 403
+Only in ../data/toscrape-2: 404
+Only in ../data/toscrape-2: 405
+Only in ../data/toscrape-2: 406
+Only in ../data/toscrape-2: 407
+Only in ../data/toscrape-2: 408
+Only in ../data/toscrape-2: 409
+Only in ../data/toscrape-2: 41
+Only in ../data/toscrape-2: 410
+Only in ../data/toscrape-2: 411
+Only in ../data/toscrape-2: 412
+Only in ../data/toscrape-2: 413
+Only in ../data/toscrape-2: 414
+Only in ../data/toscrape-2: 415
+Only in ../data/toscrape-2: 416
+Only in ../data/toscrape-2: 417
+Only in ../data/toscrape-2: 418
+Only in ../data/toscrape-2: 419
+Only in ../data/toscrape-2: 42
+Only in ../data/toscrape-2: 420
+Only in ../data/toscrape-2: 421
+Only in ../data/toscrape-2: 422
+Only in ../data/toscrape-2: 423
+Only in ../data/toscrape-2: 424
+Only in ../data/toscrape-2: 425
+Only in ../data/toscrape-2: 426
+Only in ../data/toscrape-2: 427
+Only in ../data/toscrape-2: 428
+Only in ../data/toscrape-2: 429
+Only in ../data/toscrape-2: 43
+Only in ../data/toscrape-2: 430
+Only in ../data/toscrape-2: 431
+Only in ../data/toscrape-2: 432
+Only in ../data/toscrape-2: 433
+Only in ../data/toscrape-2: 434
+Only in ../data/toscrape-2: 435
+Only in ../data/toscrape-2: 436
+Only in ../data/toscrape-2: 437
+Only in ../data/toscrape-2: 438
+Only in ../data/toscrape-2: 439
+Only in ../data/toscrape-2: 44
+Only in ../data/toscrape-2: 440
+Only in ../data/toscrape-2: 441
+Only in ../data/toscrape-2: 442
+Only in ../data/toscrape-2: 443
+Only in ../data/toscrape-2: 444
+Only in ../data/toscrape-2: 445
+Only in ../data/toscrape-2: 446
+Only in ../data/toscrape-2: 447
+Only in ../data/toscrape-2: 448
+Only in ../data/toscrape-2: 449
+Only in ../data/toscrape-2: 45
+Only in ../data/toscrape-2: 450
+Only in ../data/toscrape-2: 451
+Only in ../data/toscrape-2: 452
+Only in ../data/toscrape-2: 453
+Only in ../data/toscrape-2: 454
+Only in ../data/toscrape-2: 455
+Only in ../data/toscrape-2: 456
+Only in ../data/toscrape-2: 457
+Only in ../data/toscrape-2: 458
+Only in ../data/toscrape-2: 459
+Only in ../data/toscrape-2: 46
+Only in ../data/toscrape-2: 460
+Only in ../data/toscrape-2: 461
+Only in ../data/toscrape-2: 462
+Only in ../data/toscrape-2: 463
+Only in ../data/toscrape-2: 464
+Only in ../data/toscrape-2: 465
+Only in ../data/toscrape-2: 466
+Only in ../data/toscrape-2: 467
+Only in ../data/toscrape-2: 468
+Only in ../data/toscrape-2: 469
+Only in ../data/toscrape-2: 47
+Only in ../data/toscrape-2: 470
+Only in ../data/toscrape-2: 471
+Only in ../data/toscrape-2: 472
+Only in ../data/toscrape-2: 473
+Only in ../data/toscrape-2: 474
+Only in ../data/toscrape-2: 475
+Only in ../data/toscrape-2: 476
+Only in ../data/toscrape-2: 477
+Only in ../data/toscrape-2: 478
+Only in ../data/toscrape-2: 479
+Only in ../data/toscrape-2: 48
+Only in ../data/toscrape-2: 480
+Only in ../data/toscrape-2: 481
+Only in ../data/toscrape-2: 482
+Only in ../data/toscrape-2: 483
+Only in ../data/toscrape-2: 484
+Only in ../data/toscrape-2: 485
+Only in ../data/toscrape-2: 486
+Only in ../data/toscrape-2: 487
+Only in ../data/toscrape-2: 488
+Only in ../data/toscrape-2: 489
+Only in ../data/toscrape-2: 49
+Only in ../data/toscrape-2: 490
+Only in ../data/toscrape-2: 491
+Only in ../data/toscrape-2: 492
+Only in ../data/toscrape-2: 493
+Only in ../data/toscrape-2: 494
+Only in ../data/toscrape-2: 495
+Only in ../data/toscrape-2: 496
+Only in ../data/toscrape-2: 497
+Only in ../data/toscrape-2: 498
+Only in ../data/toscrape-2: 499
+Only in ../data/toscrape-2: 5
+Only in ../data/toscrape-2: 50
+Only in ../data/toscrape-2: 500
+Only in ../data/toscrape-2: 501
+Only in ../data/toscrape-2: 502
+Only in ../data/toscrape-2: 503
+Only in ../data/toscrape-2: 504
+Only in ../data/toscrape-2: 505
+Only in ../data/toscrape-2: 506
+Only in ../data/toscrape-2: 507
+Only in ../data/toscrape-2: 508
+Only in ../data/toscrape-2: 509
+Only in ../data/toscrape-2: 51
+Only in ../data/toscrape-2: 510
+Only in ../data/toscrape-2: 511
+Only in ../data/toscrape-2: 512
+Only in ../data/toscrape-2: 513
+Only in ../data/toscrape-2: 514
+Only in ../data/toscrape-2: 515
+Only in ../data/toscrape-2: 516
+Only in ../data/toscrape-2: 517
+Only in ../data/toscrape-2: 518
+Only in ../data/toscrape-2: 519
+Only in ../data/toscrape-2: 52
+Only in ../data/toscrape-2: 520
+Only in ../data/toscrape-2: 521
+Only in ../data/toscrape-2: 522
+Only in ../data/toscrape-2: 523
+Only in ../data/toscrape-2: 524
+Only in ../data/toscrape-2: 525
+Only in ../data/toscrape-2: 526
+Only in ../data/toscrape-2: 527
+Only in ../data/toscrape-2: 528
+Only in ../data/toscrape-2: 529
+Only in ../data/toscrape-2: 53
+Only in ../data/toscrape-2: 530
+Only in ../data/toscrape-2: 531
+Only in ../data/toscrape-2: 532
+Only in ../data/toscrape-2: 533
+Only in ../data/toscrape-2: 534
+Only in ../data/toscrape-2: 535
+Only in ../data/toscrape-2: 536
+Only in ../data/toscrape-2: 537
+Only in ../data/toscrape-2: 538
+Only in ../data/toscrape-2: 539
+Only in ../data/toscrape-2: 54
+Only in ../data/toscrape-2: 540
+Only in ../data/toscrape-2: 541
+Only in ../data/toscrape-2: 542
+Only in ../data/toscrape-2: 543
+Only in ../data/toscrape-2: 544
+Only in ../data/toscrape-2: 545
+Only in ../data/toscrape-2: 546
+Only in ../data/toscrape-2: 547
+Only in ../data/toscrape-2: 548
+Only in ../data/toscrape-2: 549
+Only in ../data/toscrape-2: 55
+Only in ../data/toscrape-2: 550
+Only in ../data/toscrape-2: 551
+Only in ../data/toscrape-2: 552
+Only in ../data/toscrape-2: 553
+Only in ../data/toscrape-2: 554
+Only in ../data/toscrape-2: 555
+Only in ../data/toscrape-2: 556
+Only in ../data/toscrape-2: 557
+Only in ../data/toscrape-2: 558
+Only in ../data/toscrape-2: 559
+Only in ../data/toscrape-2: 56
+Only in ../data/toscrape-2: 560
+Only in ../data/toscrape-2: 561
+Only in ../data/toscrape-2: 562
+Only in ../data/toscrape-2: 563
+Only in ../data/toscrape-2: 564
+Only in ../data/toscrape-2: 565
+Only in ../data/toscrape-2: 566
+Only in ../data/toscrape-2: 567
+Only in ../data/toscrape-2: 568
+Only in ../data/toscrape-2: 569
+Only in ../data/toscrape-2: 57
+Only in ../data/toscrape-2: 570
+Only in ../data/toscrape-2: 571
+Only in ../data/toscrape-2: 572
+Only in ../data/toscrape-2: 573
+Only in ../data/toscrape-2: 574
+Only in ../data/toscrape-2: 575
+Only in ../data/toscrape-2: 576
+Only in ../data/toscrape-2: 577
+Only in ../data/toscrape-2: 578
+Only in ../data/toscrape-2: 579
+Only in ../data/toscrape-2: 58
+Only in ../data/toscrape-2: 580
+Only in ../data/toscrape-2: 581
+Only in ../data/toscrape-2: 582
+Only in ../data/toscrape-2: 583
+Only in ../data/toscrape-2: 584
+Only in ../data/toscrape-2: 585
+Only in ../data/toscrape-2: 586
+Only in ../data/toscrape-2: 59
+Only in ../data/toscrape-2: 6
+Only in ../data/toscrape-2: 60
+Only in ../data/toscrape-2: 61
+Only in ../data/toscrape-2: 62
+Only in ../data/toscrape-2: 63
+Only in ../data/toscrape-2: 64
+Only in ../data/toscrape-2: 65
+Only in ../data/toscrape-2: 66
+Only in ../data/toscrape-2: 67
+Only in ../data/toscrape-2: 68
+Only in ../data/toscrape-2: 69
+Only in ../data/toscrape-2: 7
+Only in ../data/toscrape-2: 70
+Only in ../data/toscrape-2: 71
+Only in ../data/toscrape-2: 72
+Only in ../data/toscrape-2: 73
+Only in ../data/toscrape-2: 74
+Only in ../data/toscrape-2: 75
+Only in ../data/toscrape-2: 76
+Only in ../data/toscrape-2: 77
+Only in ../data/toscrape-2: 78
+Only in ../data/toscrape-2: 79
+Only in ../data/toscrape-2: 8
+Only in ../data/toscrape-2: 80
+Only in ../data/toscrape-2: 81
+Only in ../data/toscrape-2: 82
+Only in ../data/toscrape-2: 83
+Only in ../data/toscrape-2: 84
+Only in ../data/toscrape-2: 85
+Only in ../data/toscrape-2: 86
+Only in ../data/toscrape-2: 87
+Only in ../data/toscrape-2: 88
+Only in ../data/toscrape-2: 89
+Only in ../data/toscrape-2: 9
+Only in ../data/toscrape-2: 90
+Only in ../data/toscrape-2: 91
+Only in ../data/toscrape-2: 92
+Only in ../data/toscrape-2: 93
+Only in ../data/toscrape-2: 94
+Only in ../data/toscrape-2: 95
+Only in ../data/toscrape-2: 96
+Only in ../data/toscrape-2: 97
+Only in ../data/toscrape-2: 98
+Only in ../data/toscrape-2: 99
+Only in ../data/toscrape-3: .crawler
+Only in ../data/toscrape-3: 1
+Only in ../data/toscrape-3: 10
+Only in ../data/toscrape-3: 100
+Only in ../data/toscrape-3: 101
+Only in ../data/toscrape-3: 102
+Only in ../data/toscrape-3: 103
+Only in ../data/toscrape-3: 104
+Only in ../data/toscrape-3: 105
+Only in ../data/toscrape-3: 106
+Only in ../data/toscrape-3: 107
+Only in ../data/toscrape-3: 108
+Only in ../data/toscrape-3: 109
+Only in ../data/toscrape-3: 11
+Only in ../data/toscrape-3: 110
+Only in ../data/toscrape-3: 111
+Only in ../data/toscrape-3: 112
+Only in ../data/toscrape-3: 113
+Only in ../data/toscrape-3: 114
+Only in ../data/toscrape-3: 115
+Only in ../data/toscrape-3: 116
+Only in ../data/toscrape-3: 117
+Only in ../data/toscrape-3: 118
+Only in ../data/toscrape-3: 119
+Only in ../data/toscrape-3: 12
+Only in ../data/toscrape-3: 120
+Only in ../data/toscrape-3: 121
+Only in ../data/toscrape-3: 122
+Only in ../data/toscrape-3: 123
+Only in ../data/toscrape-3: 124
+Only in ../data/toscrape-3: 125
+Only in ../data/toscrape-3: 126
+Only in ../data/toscrape-3: 127
+Only in ../data/toscrape-3: 128
+Only in ../data/toscrape-3: 129
+Only in ../data/toscrape-3: 13
+Only in ../data/toscrape-3: 130
+Only in ../data/toscrape-3: 131
+Only in ../data/toscrape-3: 132
+Only in ../data/toscrape-3: 133
+Only in ../data/toscrape-3: 134
+Only in ../data/toscrape-3: 135
+Only in ../data/toscrape-3: 136
+Only in ../data/toscrape-3: 137
+Only in ../data/toscrape-3: 138
+Only in ../data/toscrape-3: 139
+Only in ../data/toscrape-3: 14
+Only in ../data/toscrape-3: 140
+Only in ../data/toscrape-3: 141
+Only in ../data/toscrape-3: 142
+Only in ../data/toscrape-3: 143
+Only in ../data/toscrape-3: 144
+Only in ../data/toscrape-3: 145
+Only in ../data/toscrape-3: 146
+Only in ../data/toscrape-3: 147
+Only in ../data/toscrape-3: 148
+Only in ../data/toscrape-3: 149
+Only in ../data/toscrape-3: 15
+Only in ../data/toscrape-3: 150
+Only in ../data/toscrape-3: 151
+Only in ../data/toscrape-3: 152
+Only in ../data/toscrape-3: 153
+Only in ../data/toscrape-3: 154
+Only in ../data/toscrape-3: 155
+Only in ../data/toscrape-3: 156
+Only in ../data/toscrape-3: 157
+Only in ../data/toscrape-3: 158
+Only in ../data/toscrape-3: 159
+Only in ../data/toscrape-3: 16
+Only in ../data/toscrape-3: 160
+Only in ../data/toscrape-3: 161
+Only in ../data/toscrape-3: 162
+Only in ../data/toscrape-3: 163
+Only in ../data/toscrape-3: 164
+Only in ../data/toscrape-3: 165
+Only in ../data/toscrape-3: 166
+Only in ../data/toscrape-3: 167
+Only in ../data/toscrape-3: 168
+Only in ../data/toscrape-3: 169
+Only in ../data/toscrape-3: 17
+Only in ../data/toscrape-3: 170
+Only in ../data/toscrape-3: 171
+Only in ../data/toscrape-3: 172
+Only in ../data/toscrape-3: 173
+Only in ../data/toscrape-3: 174
+Only in ../data/toscrape-3: 175
+Only in ../data/toscrape-3: 176
+Only in ../data/toscrape-3: 177
+Only in ../data/toscrape-3: 178
+Only in ../data/toscrape-3: 179
+Only in ../data/toscrape-3: 18
+Only in ../data/toscrape-3: 180
+Only in ../data/toscrape-3: 181
+Only in ../data/toscrape-3: 182
+Only in ../data/toscrape-3: 183
+Only in ../data/toscrape-3: 184
+Only in ../data/toscrape-3: 185
+Only in ../data/toscrape-3: 186
+Only in ../data/toscrape-3: 187
+Only in ../data/toscrape-3: 188
+Only in ../data/toscrape-3: 189
+Only in ../data/toscrape-3: 19
+Only in ../data/toscrape-3: 190
+Only in ../data/toscrape-3: 191
+Only in ../data/toscrape-3: 192
+Only in ../data/toscrape-3: 193
+Only in ../data/toscrape-3: 194
+Only in ../data/toscrape-3: 195
+Only in ../data/toscrape-3: 196
+Only in ../data/toscrape-3: 197
+Only in ../data/toscrape-3: 198
+Only in ../data/toscrape-3: 199
+Only in ../data/toscrape-3: 2
+Only in ../data/toscrape-3: 20
+Only in ../data/toscrape-3: 200
+Only in ../data/toscrape-3: 201
+Only in ../data/toscrape-3: 202
+Only in ../data/toscrape-3: 203
+Only in ../data/toscrape-3: 204
+Only in ../data/toscrape-3: 205
+Only in ../data/toscrape-3: 206
+Only in ../data/toscrape-3: 207
+Only in ../data/toscrape-3: 208
+Only in ../data/toscrape-3: 209
+Only in ../data/toscrape-3: 21
+Only in ../data/toscrape-3: 210
+Only in ../data/toscrape-3: 211
+Only in ../data/toscrape-3: 212
+Only in ../data/toscrape-3: 213
+Only in ../data/toscrape-3: 214
+Only in ../data/toscrape-3: 215
+Only in ../data/toscrape-3: 216
+Only in ../data/toscrape-3: 217
+Only in ../data/toscrape-3: 218
+Only in ../data/toscrape-3: 219
+Only in ../data/toscrape-3: 22
+Only in ../data/toscrape-3: 220
+Only in ../data/toscrape-3: 221
+Only in ../data/toscrape-3: 222
+Only in ../data/toscrape-3: 223
+Only in ../data/toscrape-3: 224
+Only in ../data/toscrape-3: 225
+Only in ../data/toscrape-3: 226
+Only in ../data/toscrape-3: 227
+Only in ../data/toscrape-3: 228
+Only in ../data/toscrape-3: 229
+Only in ../data/toscrape-3: 23
+Only in ../data/toscrape-3: 230
+Only in ../data/toscrape-3: 231
+Only in ../data/toscrape-3: 232
+Only in ../data/toscrape-3: 233
+Only in ../data/toscrape-3: 234
+Only in ../data/toscrape-3: 235
+Only in ../data/toscrape-3: 236
+Only in ../data/toscrape-3: 237
+Only in ../data/toscrape-3: 238
+Only in ../data/toscrape-3: 239
+Only in ../data/toscrape-3: 24
+Only in ../data/toscrape-3: 240
+Only in ../data/toscrape-3: 241
+Only in ../data/toscrape-3: 242
+Only in ../data/toscrape-3: 243
+Only in ../data/toscrape-3: 244
+Only in ../data/toscrape-3: 245
+Only in ../data/toscrape-3: 246
+Only in ../data/toscrape-3: 247
+Only in ../data/toscrape-3: 248
+Only in ../data/toscrape-3: 249
+Only in ../data/toscrape-3: 25
+Only in ../data/toscrape-3: 250
+Only in ../data/toscrape-3: 251
+Only in ../data/toscrape-3: 252
+Only in ../data/toscrape-3: 253
+Only in ../data/toscrape-3: 254
+Only in ../data/toscrape-3: 255
+Only in ../data/toscrape-3: 256
+Only in ../data/toscrape-3: 257
+Only in ../data/toscrape-3: 258
+Only in ../data/toscrape-3: 259
+Only in ../data/toscrape-3: 26
+Only in ../data/toscrape-3: 260
+Only in ../data/toscrape-3: 261
+Only in ../data/toscrape-3: 262
+Only in ../data/toscrape-3: 263
+Only in ../data/toscrape-3: 264
+Only in ../data/toscrape-3: 265
+Only in ../data/toscrape-3: 266
+Only in ../data/toscrape-3: 267
+Only in ../data/toscrape-3: 268
+Only in ../data/toscrape-3: 269
+Only in ../data/toscrape-3: 27
+Only in ../data/toscrape-3: 270
+Only in ../data/toscrape-3: 271
+Only in ../data/toscrape-3: 272
+Only in ../data/toscrape-3: 273
+Only in ../data/toscrape-3: 274
+Only in ../data/toscrape-3: 275
+Only in ../data/toscrape-3: 276
+Only in ../data/toscrape-3: 277
+Only in ../data/toscrape-3: 278
+Only in ../data/toscrape-3: 279
+Only in ../data/toscrape-3: 28
+Only in ../data/toscrape-3: 280
+Only in ../data/toscrape-3: 281
+Only in ../data/toscrape-3: 282
+Only in ../data/toscrape-3: 283
+Only in ../data/toscrape-3: 284
+Only in ../data/toscrape-3: 285
+Only in ../data/toscrape-3: 286
+Only in ../data/toscrape-3: 287
+Only in ../data/toscrape-3: 288
+Only in ../data/toscrape-3: 289
+Only in ../data/toscrape-3: 29
+Only in ../data/toscrape-3: 290
+Only in ../data/toscrape-3: 291
+Only in ../data/toscrape-3: 292
+Only in ../data/toscrape-3: 293
+Only in ../data/toscrape-3: 294
+Only in ../data/toscrape-3: 295
+Only in ../data/toscrape-3: 296
+Only in ../data/toscrape-3: 297
+Only in ../data/toscrape-3: 298
+Only in ../data/toscrape-3: 299
+Only in ../data/toscrape-3: 3
+Only in ../data/toscrape-3: 30
+Only in ../data/toscrape-3: 300
+Only in ../data/toscrape-3: 301
+Only in ../data/toscrape-3: 302
+Only in ../data/toscrape-3: 303
+Only in ../data/toscrape-3: 304
+Only in ../data/toscrape-3: 305
+Only in ../data/toscrape-3: 306
+Only in ../data/toscrape-3: 307
+Only in ../data/toscrape-3: 308
+Only in ../data/toscrape-3: 309
+Only in ../data/toscrape-3: 31
+Only in ../data/toscrape-3: 310
+Only in ../data/toscrape-3: 311
+Only in ../data/toscrape-3: 312
+Only in ../data/toscrape-3: 313
+Only in ../data/toscrape-3: 314
+Only in ../data/toscrape-3: 315
+Only in ../data/toscrape-3: 316
+Only in ../data/toscrape-3: 317
+Only in ../data/toscrape-3: 318
+Only in ../data/toscrape-3: 319
+Only in ../data/toscrape-3: 32
+Only in ../data/toscrape-3: 320
+Only in ../data/toscrape-3: 321
+Only in ../data/toscrape-3: 322
+Only in ../data/toscrape-3: 323
+Only in ../data/toscrape-3: 324
+Only in ../data/toscrape-3: 325
+Only in ../data/toscrape-3: 326
+Only in ../data/toscrape-3: 327
+Only in ../data/toscrape-3: 328
+Only in ../data/toscrape-3: 329
+Only in ../data/toscrape-3: 33
+Only in ../data/toscrape-3: 330
+Only in ../data/toscrape-3: 331
+Only in ../data/toscrape-3: 332
+Only in ../data/toscrape-3: 333
+Only in ../data/toscrape-3: 334
+Only in ../data/toscrape-3: 335
+Only in ../data/toscrape-3: 336
+Only in ../data/toscrape-3: 337
+Only in ../data/toscrape-3: 338
+Only in ../data/toscrape-3: 339
+Only in ../data/toscrape-3: 34
+Only in ../data/toscrape-3: 340
+Only in ../data/toscrape-3: 341
+Only in ../data/toscrape-3: 342
+Only in ../data/toscrape-3: 343
+Only in ../data/toscrape-3: 344
+Only in ../data/toscrape-3: 345
+Only in ../data/toscrape-3: 346
+Only in ../data/toscrape-3: 347
+Only in ../data/toscrape-3: 348
+Only in ../data/toscrape-3: 349
+Only in ../data/toscrape-3: 35
+Only in ../data/toscrape-3: 350
+Only in ../data/toscrape-3: 351
+Only in ../data/toscrape-3: 352
+Only in ../data/toscrape-3: 353
+Only in ../data/toscrape-3: 354
+Only in ../data/toscrape-3: 355
+Only in ../data/toscrape-3: 356
+Only in ../data/toscrape-3: 357
+Only in ../data/toscrape-3: 358
+Only in ../data/toscrape-3: 359
+Only in ../data/toscrape-3: 36
+Only in ../data/toscrape-3: 360
+Only in ../data/toscrape-3: 361
+Only in ../data/toscrape-3: 362
+Only in ../data/toscrape-3: 363
+Only in ../data/toscrape-3: 364
+Only in ../data/toscrape-3: 365
+Only in ../data/toscrape-3: 366
+Only in ../data/toscrape-3: 367
+Only in ../data/toscrape-3: 368
+Only in ../data/toscrape-3: 369
+Only in ../data/toscrape-3: 37
+Only in ../data/toscrape-3: 370
+Only in ../data/toscrape-3: 371
+Only in ../data/toscrape-3: 372
+Only in ../data/toscrape-3: 373
+Only in ../data/toscrape-3: 374
+Only in ../data/toscrape-3: 375
+Only in ../data/toscrape-3: 376
+Only in ../data/toscrape-3: 377
+Only in ../data/toscrape-3: 378
+Only in ../data/toscrape-3: 379
+Only in ../data/toscrape-3: 38
+Only in ../data/toscrape-3: 380
+Only in ../data/toscrape-3: 381
+Only in ../data/toscrape-3: 382
+Only in ../data/toscrape-3: 383
+Only in ../data/toscrape-3: 384
+Only in ../data/toscrape-3: 385
+Only in ../data/toscrape-3: 386
+Only in ../data/toscrape-3: 387
+Only in ../data/toscrape-3: 388
+Only in ../data/toscrape-3: 389
+Only in ../data/toscrape-3: 39
+Only in ../data/toscrape-3: 390
+Only in ../data/toscrape-3: 391
+Only in ../data/toscrape-3: 392
+Only in ../data/toscrape-3: 393
+Only in ../data/toscrape-3: 394
+Only in ../data/toscrape-3: 395
+Only in ../data/toscrape-3: 396
+Only in ../data/toscrape-3: 397
+Only in ../data/toscrape-3: 398
+Only in ../data/toscrape-3: 399
+Only in ../data/toscrape-3: 4
+Only in ../data/toscrape-3: 40
+Only in ../data/toscrape-3: 400
+Only in ../data/toscrape-3: 401
+Only in ../data/toscrape-3: 402
+Only in ../data/toscrape-3: 403
+Only in ../data/toscrape-3: 404
+Only in ../data/toscrape-3: 405
+Only in ../data/toscrape-3: 406
+Only in ../data/toscrape-3: 407
+Only in ../data/toscrape-3: 408
+Only in ../data/toscrape-3: 409
+Only in ../data/toscrape-3: 41
+Only in ../data/toscrape-3: 410
+Only in ../data/toscrape-3: 411
+Only in ../data/toscrape-3: 412
+Only in ../data/toscrape-3: 413
+Only in ../data/toscrape-3: 414
+Only in ../data/toscrape-3: 415
+Only in ../data/toscrape-3: 416
+Only in ../data/toscrape-3: 417
+Only in ../data/toscrape-3: 418
+Only in ../data/toscrape-3: 419
+Only in ../data/toscrape-3: 42
+Only in ../data/toscrape-3: 420
+Only in ../data/toscrape-3: 421
+Only in ../data/toscrape-3: 422
+Only in ../data/toscrape-3: 423
+Only in ../data/toscrape-3: 424
+Only in ../data/toscrape-3: 425
+Only in ../data/toscrape-3: 426
+Only in ../data/toscrape-3: 427
+Only in ../data/toscrape-3: 428
+Only in ../data/toscrape-3: 429
+Only in ../data/toscrape-3: 43
+Only in ../data/toscrape-3: 430
+Only in ../data/toscrape-3: 431
+Only in ../data/toscrape-3: 432
+Only in ../data/toscrape-3: 433
+Only in ../data/toscrape-3: 434
+Only in ../data/toscrape-3: 435
+Only in ../data/toscrape-3: 436
+Only in ../data/toscrape-3: 437
+Only in ../data/toscrape-3: 438
+Only in ../data/toscrape-3: 439
+Only in ../data/toscrape-3: 44
+Only in ../data/toscrape-3: 440
+Only in ../data/toscrape-3: 441
+Only in ../data/toscrape-3: 442
+Only in ../data/toscrape-3: 443
+Only in ../data/toscrape-3: 444
+Only in ../data/toscrape-3: 445
+Only in ../data/toscrape-3: 446
+Only in ../data/toscrape-3: 447
+Only in ../data/toscrape-3: 448
+Only in ../data/toscrape-3: 449
+Only in ../data/toscrape-3: 45
+Only in ../data/toscrape-3: 450
+Only in ../data/toscrape-3: 451
+Only in ../data/toscrape-3: 452
+Only in ../data/toscrape-3: 453
+Only in ../data/toscrape-3: 454
+Only in ../data/toscrape-3: 455
+Only in ../data/toscrape-3: 456
+Only in ../data/toscrape-3: 457
+Only in ../data/toscrape-3: 458
+Only in ../data/toscrape-3: 459
+Only in ../data/toscrape-3: 46
+Only in ../data/toscrape-3: 460
+Only in ../data/toscrape-3: 461
+Only in ../data/toscrape-3: 462
+Only in ../data/toscrape-3: 463
+Only in ../data/toscrape-3: 464
+Only in ../data/toscrape-3: 465
+Only in ../data/toscrape-3: 466
+Only in ../data/toscrape-3: 467
+Only in ../data/toscrape-3: 468
+Only in ../data/toscrape-3: 469
+Only in ../data/toscrape-3: 47
+Only in ../data/toscrape-3: 470
+Only in ../data/toscrape-3: 471
+Only in ../data/toscrape-3: 472
+Only in ../data/toscrape-3: 473
+Only in ../data/toscrape-3: 474
+Only in ../data/toscrape-3: 475
+Only in ../data/toscrape-3: 476
+Only in ../data/toscrape-3: 477
+Only in ../data/toscrape-3: 478
+Only in ../data/toscrape-3: 479
+Only in ../data/toscrape-3: 48
+Only in ../data/toscrape-3: 480
+Only in ../data/toscrape-3: 481
+Only in ../data/toscrape-3: 482
+Only in ../data/toscrape-3: 483
+Only in ../data/toscrape-3: 484
+Only in ../data/toscrape-3: 485
+Only in ../data/toscrape-3: 486
+Only in ../data/toscrape-3: 487
+Only in ../data/toscrape-3: 488
+Only in ../data/toscrape-3: 489
+Only in ../data/toscrape-3: 49
+Only in ../data/toscrape-3: 490
+Only in ../data/toscrape-3: 491
+Only in ../data/toscrape-3: 492
+Only in ../data/toscrape-3: 493
+Only in ../data/toscrape-3: 494
+Only in ../data/toscrape-3: 495
+Only in ../data/toscrape-3: 496
+Only in ../data/toscrape-3: 497
+Only in ../data/toscrape-3: 498
+Only in ../data/toscrape-3: 499
+Only in ../data/toscrape-3: 5
+Only in ../data/toscrape-3: 50
+Only in ../data/toscrape-3: 500
+Only in ../data/toscrape-3: 501
+Only in ../data/toscrape-3: 502
+Only in ../data/toscrape-3: 503
+Only in ../data/toscrape-3: 504
+Only in ../data/toscrape-3: 505
+Only in ../data/toscrape-3: 506
+Only in ../data/toscrape-3: 507
+Only in ../data/toscrape-3: 508
+Only in ../data/toscrape-3: 509
+Only in ../data/toscrape-3: 51
+Only in ../data/toscrape-3: 510
+Only in ../data/toscrape-3: 511
+Only in ../data/toscrape-3: 512
+Only in ../data/toscrape-3: 513
+Only in ../data/toscrape-3: 514
+Only in ../data/toscrape-3: 515
+Only in ../data/toscrape-3: 516
+Only in ../data/toscrape-3: 517
+Only in ../data/toscrape-3: 518
+Only in ../data/toscrape-3: 519
+Only in ../data/toscrape-3: 52
+Only in ../data/toscrape-3: 520
+Only in ../data/toscrape-3: 521
+Only in ../data/toscrape-3: 522
+Only in ../data/toscrape-3: 523
+Only in ../data/toscrape-3: 524
+Only in ../data/toscrape-3: 525
+Only in ../data/toscrape-3: 526
+Only in ../data/toscrape-3: 527
+Only in ../data/toscrape-3: 528
+Only in ../data/toscrape-3: 529
+Only in ../data/toscrape-3: 53
+Only in ../data/toscrape-3: 530
+Only in ../data/toscrape-3: 531
+Only in ../data/toscrape-3: 532
+Only in ../data/toscrape-3: 533
+Only in ../data/toscrape-3: 534
+Only in ../data/toscrape-3: 535
+Only in ../data/toscrape-3: 536
+Only in ../data/toscrape-3: 537
+Only in ../data/toscrape-3: 538
+Only in ../data/toscrape-3: 539
+Only in ../data/toscrape-3: 54
+Only in ../data/toscrape-3: 540
+Only in ../data/toscrape-3: 541
+Only in ../data/toscrape-3: 542
+Only in ../data/toscrape-3: 543
+Only in ../data/toscrape-3: 544
+Only in ../data/toscrape-3: 545
+Only in ../data/toscrape-3: 546
+Only in ../data/toscrape-3: 547
+Only in ../data/toscrape-3: 548
+Only in ../data/toscrape-3: 549
+Only in ../data/toscrape-3: 55
+Only in ../data/toscrape-3: 550
+Only in ../data/toscrape-3: 551
+Only in ../data/toscrape-3: 552
+Only in ../data/toscrape-3: 553
+Only in ../data/toscrape-3: 554
+Only in ../data/toscrape-3: 555
+Only in ../data/toscrape-3: 556
+Only in ../data/toscrape-3: 557
+Only in ../data/toscrape-3: 558
+Only in ../data/toscrape-3: 559
+Only in ../data/toscrape-3: 56
+Only in ../data/toscrape-3: 560
+Only in ../data/toscrape-3: 561
+Only in ../data/toscrape-3: 562
+Only in ../data/toscrape-3: 563
+Only in ../data/toscrape-3: 564
+Only in ../data/toscrape-3: 565
+Only in ../data/toscrape-3: 566
+Only in ../data/toscrape-3: 567
+Only in ../data/toscrape-3: 568
+Only in ../data/toscrape-3: 569
+Only in ../data/toscrape-3: 57
+Only in ../data/toscrape-3: 570
+Only in ../data/toscrape-3: 571
+Only in ../data/toscrape-3: 572
+Only in ../data/toscrape-3: 573
+Only in ../data/toscrape-3: 574
+Only in ../data/toscrape-3: 575
+Only in ../data/toscrape-3: 576
+Only in ../data/toscrape-3: 577
+Only in ../data/toscrape-3: 578
+Only in ../data/toscrape-3: 579
+Only in ../data/toscrape-3: 58
+Only in ../data/toscrape-3: 580
+Only in ../data/toscrape-3: 581
+Only in ../data/toscrape-3: 582
+Only in ../data/toscrape-3: 583
+Only in ../data/toscrape-3: 584
+Only in ../data/toscrape-3: 585
+Only in ../data/toscrape-3: 586
+Only in ../data/toscrape-3: 587
+Only in ../data/toscrape-3: 588
+Only in ../data/toscrape-3: 589
+Only in ../data/toscrape-3: 59
+Only in ../data/toscrape-3: 590
+Only in ../data/toscrape-3: 591
+Only in ../data/toscrape-3: 592
+Only in ../data/toscrape-3: 593
+Only in ../data/toscrape-3: 594
+Only in ../data/toscrape-3: 595
+Only in ../data/toscrape-3: 596
+Only in ../data/toscrape-3: 597
+Only in ../data/toscrape-3: 598
+Only in ../data/toscrape-3: 599
+Only in ../data/toscrape-3: 6
+Only in ../data/toscrape-3: 60
+Only in ../data/toscrape-3: 600
+Only in ../data/toscrape-3: 601
+Only in ../data/toscrape-3: 602
+Only in ../data/toscrape-3: 603
+Only in ../data/toscrape-3: 604
+Only in ../data/toscrape-3: 605
+Only in ../data/toscrape-3: 606
+Only in ../data/toscrape-3: 607
+Only in ../data/toscrape-3: 608
+Only in ../data/toscrape-3: 609
+Only in ../data/toscrape-3: 61
+Only in ../data/toscrape-3: 610
+Only in ../data/toscrape-3: 611
+Only in ../data/toscrape-3: 612
+Only in ../data/toscrape-3: 613
+Only in ../data/toscrape-3: 614
+Only in ../data/toscrape-3: 615
+Only in ../data/toscrape-3: 616
+Only in ../data/toscrape-3: 617
+Only in ../data/toscrape-3: 618
+Only in ../data/toscrape-3: 619
+Only in ../data/toscrape-3: 62
+Only in ../data/toscrape-3: 620
+Only in ../data/toscrape-3: 621
+Only in ../data/toscrape-3: 622
+Only in ../data/toscrape-3: 623
+Only in ../data/toscrape-3: 624
+Only in ../data/toscrape-3: 625
+Only in ../data/toscrape-3: 626
+Only in ../data/toscrape-3: 627
+Only in ../data/toscrape-3: 628
+Only in ../data/toscrape-3: 629
+Only in ../data/toscrape-3: 63
+Only in ../data/toscrape-3: 630
+Only in ../data/toscrape-3: 631
+Only in ../data/toscrape-3: 632
+Only in ../data/toscrape-3: 633
+Only in ../data/toscrape-3: 634
+Only in ../data/toscrape-3: 635
+Only in ../data/toscrape-3: 636
+Only in ../data/toscrape-3: 637
+Only in ../data/toscrape-3: 638
+Only in ../data/toscrape-3: 639
+Only in ../data/toscrape-3: 64
+Only in ../data/toscrape-3: 640
+Only in ../data/toscrape-3: 641
+Only in ../data/toscrape-3: 642
+Only in ../data/toscrape-3: 643
+Only in ../data/toscrape-3: 644
+Only in ../data/toscrape-3: 645
+Only in ../data/toscrape-3: 646
+Only in ../data/toscrape-3: 647
+Only in ../data/toscrape-3: 648
+Only in ../data/toscrape-3: 649
+Only in ../data/toscrape-3: 65
+Only in ../data/toscrape-3: 650
+Only in ../data/toscrape-3: 651
+Only in ../data/toscrape-3: 652
+Only in ../data/toscrape-3: 653
+Only in ../data/toscrape-3: 654
+Only in ../data/toscrape-3: 655
+Only in ../data/toscrape-3: 656
+Only in ../data/toscrape-3: 657
+Only in ../data/toscrape-3: 658
+Only in ../data/toscrape-3: 659
+Only in ../data/toscrape-3: 66
+Only in ../data/toscrape-3: 660
+Only in ../data/toscrape-3: 661
+Only in ../data/toscrape-3: 662
+Only in ../data/toscrape-3: 663
+Only in ../data/toscrape-3: 664
+Only in ../data/toscrape-3: 665
+Only in ../data/toscrape-3: 666
+Only in ../data/toscrape-3: 667
+Only in ../data/toscrape-3: 668
+Only in ../data/toscrape-3: 669
+Only in ../data/toscrape-3: 67
+Only in ../data/toscrape-3: 670
+Only in ../data/toscrape-3: 671
+Only in ../data/toscrape-3: 672
+Only in ../data/toscrape-3: 673
+Only in ../data/toscrape-3: 674
+Only in ../data/toscrape-3: 675
+Only in ../data/toscrape-3: 676
+Only in ../data/toscrape-3: 677
+Only in ../data/toscrape-3: 678
+Only in ../data/toscrape-3: 679
+Only in ../data/toscrape-3: 68
+Only in ../data/toscrape-3: 680
+Only in ../data/toscrape-3: 681
+Only in ../data/toscrape-3: 682
+Only in ../data/toscrape-3: 683
+Only in ../data/toscrape-3: 684
+Only in ../data/toscrape-3: 685
+Only in ../data/toscrape-3: 686
+Only in ../data/toscrape-3: 687
+Only in ../data/toscrape-3: 688
+Only in ../data/toscrape-3: 689
+Only in ../data/toscrape-3: 69
+Only in ../data/toscrape-3: 690
+Only in ../data/toscrape-3: 691
+Only in ../data/toscrape-3: 692
+Only in ../data/toscrape-3: 693
+Only in ../data/toscrape-3: 694
+Only in ../data/toscrape-3: 695
+Only in ../data/toscrape-3: 696
+Only in ../data/toscrape-3: 697
+Only in ../data/toscrape-3: 698
+Only in ../data/toscrape-3: 699
+Only in ../data/toscrape-3: 7
+Only in ../data/toscrape-3: 70
+Only in ../data/toscrape-3: 700
+Only in ../data/toscrape-3: 701
+Only in ../data/toscrape-3: 702
+Only in ../data/toscrape-3: 703
+Only in ../data/toscrape-3: 704
+Only in ../data/toscrape-3: 705
+Only in ../data/toscrape-3: 706
+Only in ../data/toscrape-3: 707
+Only in ../data/toscrape-3: 708
+Only in ../data/toscrape-3: 709
+Only in ../data/toscrape-3: 71
+Only in ../data/toscrape-3: 710
+Only in ../data/toscrape-3: 711
+Only in ../data/toscrape-3: 712
+Only in ../data/toscrape-3: 713
+Only in ../data/toscrape-3: 714
+Only in ../data/toscrape-3: 715
+Only in ../data/toscrape-3: 716
+Only in ../data/toscrape-3: 717
+Only in ../data/toscrape-3: 718
+Only in ../data/toscrape-3: 719
+Only in ../data/toscrape-3: 72
+Only in ../data/toscrape-3: 720
+Only in ../data/toscrape-3: 721
+Only in ../data/toscrape-3: 722
+Only in ../data/toscrape-3: 723
+Only in ../data/toscrape-3: 724
+Only in ../data/toscrape-3: 725
+Only in ../data/toscrape-3: 726
+Only in ../data/toscrape-3: 727
+Only in ../data/toscrape-3: 728
+Only in ../data/toscrape-3: 729
+Only in ../data/toscrape-3: 73
+Only in ../data/toscrape-3: 730
+Only in ../data/toscrape-3: 731
+Only in ../data/toscrape-3: 732
+Only in ../data/toscrape-3: 733
+Only in ../data/toscrape-3: 734
+Only in ../data/toscrape-3: 735
+Only in ../data/toscrape-3: 736
+Only in ../data/toscrape-3: 737
+Only in ../data/toscrape-3: 738
+Only in ../data/toscrape-3: 739
+Only in ../data/toscrape-3: 74
+Only in ../data/toscrape-3: 740
+Only in ../data/toscrape-3: 741
+Only in ../data/toscrape-3: 742
+Only in ../data/toscrape-3: 743
+Only in ../data/toscrape-3: 744
+Only in ../data/toscrape-3: 745
+Only in ../data/toscrape-3: 746
+Only in ../data/toscrape-3: 747
+Only in ../data/toscrape-3: 748
+Only in ../data/toscrape-3: 749
+Only in ../data/toscrape-3: 75
+Only in ../data/toscrape-3: 750
+Only in ../data/toscrape-3: 751
+Only in ../data/toscrape-3: 752
+Only in ../data/toscrape-3: 753
+Only in ../data/toscrape-3: 754
+Only in ../data/toscrape-3: 755
+Only in ../data/toscrape-3: 756
+Only in ../data/toscrape-3: 757
+Only in ../data/toscrape-3: 758
+Only in ../data/toscrape-3: 759
+Only in ../data/toscrape-3: 76
+Only in ../data/toscrape-3: 760
+Only in ../data/toscrape-3: 761
+Only in ../data/toscrape-3: 762
+Only in ../data/toscrape-3: 763
+Only in ../data/toscrape-3: 764
+Only in ../data/toscrape-3: 765
+Only in ../data/toscrape-3: 766
+Only in ../data/toscrape-3: 767
+Only in ../data/toscrape-3: 768
+Only in ../data/toscrape-3: 769
+Only in ../data/toscrape-3: 77
+Only in ../data/toscrape-3: 770
+Only in ../data/toscrape-3: 771
+Only in ../data/toscrape-3: 772
+Only in ../data/toscrape-3: 773
+Only in ../data/toscrape-3: 774
+Only in ../data/toscrape-3: 775
+Only in ../data/toscrape-3: 776
+Only in ../data/toscrape-3: 777
+Only in ../data/toscrape-3: 778
+Only in ../data/toscrape-3: 779
+Only in ../data/toscrape-3: 78
+Only in ../data/toscrape-3: 780
+Only in ../data/toscrape-3: 781
+Only in ../data/toscrape-3: 782
+Only in ../data/toscrape-3: 783
+Only in ../data/toscrape-3: 784
+Only in ../data/toscrape-3: 785
+Only in ../data/toscrape-3: 786
+Only in ../data/toscrape-3: 787
+Only in ../data/toscrape-3: 788
+Only in ../data/toscrape-3: 789
+Only in ../data/toscrape-3: 79
+Only in ../data/toscrape-3: 790
+Only in ../data/toscrape-3: 791
+Only in ../data/toscrape-3: 792
+Only in ../data/toscrape-3: 793
+Only in ../data/toscrape-3: 794
+Only in ../data/toscrape-3: 795
+Only in ../data/toscrape-3: 796
+Only in ../data/toscrape-3: 797
+Only in ../data/toscrape-3: 798
+Only in ../data/toscrape-3: 799
+Only in ../data/toscrape-3: 8
+Only in ../data/toscrape-3: 80
+Only in ../data/toscrape-3: 800
+Only in ../data/toscrape-3: 81
+Only in ../data/toscrape-3: 82
+Only in ../data/toscrape-3: 83
+Only in ../data/toscrape-3: 84
+Only in ../data/toscrape-3: 85
+Only in ../data/toscrape-3: 86
+Only in ../data/toscrape-3: 87
+Only in ../data/toscrape-3: 88
+Only in ../data/toscrape-3: 89
+Only in ../data/toscrape-3: 9
+Only in ../data/toscrape-3: 90
+Only in ../data/toscrape-3: 91
+Only in ../data/toscrape-3: 92
+Only in ../data/toscrape-3: 93
+Only in ../data/toscrape-3: 94
+Only in ../data/toscrape-3: 95
+Only in ../data/toscrape-3: 96
+Only in ../data/toscrape-3: 97
+Only in ../data/toscrape-3: 98
+Only in ../data/toscrape-3: 99
+Only in ../data/wikipedia-0: .crawler
+Only in ../data/wikipedia-0: 1
+Only in ../data/wikipedia-1: .crawler
+Only in ../data/wikipedia-1: 1
+Only in ../data/wikipedia-1: 2
+Only in ../data/wikipedia-1: 3
+Only in ../data/wikipedia-1: 4
+Only in ../data/wikipedia-1: 5
+Only in ../data/wikipedia-1: 6
+Only in ../data/wikipedia-1: 7
+Only in ../data/wikipedia-2: .crawler
+Only in ../data/wikipedia-2: 1
+Only in ../data/wikipedia-2: 10
+Only in ../data/wikipedia-2: 100
+Only in ../data/wikipedia-2: 1000
+Only in ../data/wikipedia-2: 1001
+Only in ../data/wikipedia-2: 1002
+Only in ../data/wikipedia-2: 1003
+Only in ../data/wikipedia-2: 1004
+Only in ../data/wikipedia-2: 1005
+Only in ../data/wikipedia-2: 1006
+Only in ../data/wikipedia-2: 1007
+Only in ../data/wikipedia-2: 1008
+Only in ../data/wikipedia-2: 1009
+Only in ../data/wikipedia-2: 101
+Only in ../data/wikipedia-2: 1010
+Only in ../data/wikipedia-2: 1011
+Only in ../data/wikipedia-2: 1012
+Only in ../data/wikipedia-2: 1013
+Only in ../data/wikipedia-2: 1014
+Only in ../data/wikipedia-2: 1015
+Only in ../data/wikipedia-2: 1016
+Only in ../data/wikipedia-2: 1017
+Only in ../data/wikipedia-2: 1018
+Only in ../data/wikipedia-2: 1019
+Only in ../data/wikipedia-2: 102
+Only in ../data/wikipedia-2: 1020
+Only in ../data/wikipedia-2: 1021
+Only in ../data/wikipedia-2: 1022
+Only in ../data/wikipedia-2: 1023
+Only in ../data/wikipedia-2: 1024
+Only in ../data/wikipedia-2: 1025
+Only in ../data/wikipedia-2: 1026
+Only in ../data/wikipedia-2: 1027
+Only in ../data/wikipedia-2: 1028
+Only in ../data/wikipedia-2: 1029
+Only in ../data/wikipedia-2: 103
+Only in ../data/wikipedia-2: 1030
+Only in ../data/wikipedia-2: 1031
+Only in ../data/wikipedia-2: 1032
+Only in ../data/wikipedia-2: 1033
+Only in ../data/wikipedia-2: 1034
+Only in ../data/wikipedia-2: 1035
+Only in ../data/wikipedia-2: 1036
+Only in ../data/wikipedia-2: 1037
+Only in ../data/wikipedia-2: 1038
+Only in ../data/wikipedia-2: 1039
+Only in ../data/wikipedia-2: 104
+Only in ../data/wikipedia-2: 1040
+Only in ../data/wikipedia-2: 1041
+Only in ../data/wikipedia-2: 1042
+Only in ../data/wikipedia-2: 1043
+Only in ../data/wikipedia-2: 1044
+Only in ../data/wikipedia-2: 1045
+Only in ../data/wikipedia-2: 1046
+Only in ../data/wikipedia-2: 1047
+Only in ../data/wikipedia-2: 1048
+Only in ../data/wikipedia-2: 1049
+Only in ../data/wikipedia-2: 105
+Only in ../data/wikipedia-2: 1050
+Only in ../data/wikipedia-2: 1051
+Only in ../data/wikipedia-2: 1052
+Only in ../data/wikipedia-2: 1053
+Only in ../data/wikipedia-2: 1054
+Only in ../data/wikipedia-2: 1055
+Only in ../data/wikipedia-2: 1056
+Only in ../data/wikipedia-2: 1057
+Only in ../data/wikipedia-2: 1058
+Only in ../data/wikipedia-2: 1059
+Only in ../data/wikipedia-2: 106
+Only in ../data/wikipedia-2: 1060
+Only in ../data/wikipedia-2: 1061
+Only in ../data/wikipedia-2: 1062
+Only in ../data/wikipedia-2: 1063
+Only in ../data/wikipedia-2: 1064
+Only in ../data/wikipedia-2: 1065
+Only in ../data/wikipedia-2: 1066
+Only in ../data/wikipedia-2: 1067
+Only in ../data/wikipedia-2: 1068
+Only in ../data/wikipedia-2: 1069
+Only in ../data/wikipedia-2: 107
+Only in ../data/wikipedia-2: 1070
+Only in ../data/wikipedia-2: 1071
+Only in ../data/wikipedia-2: 1072
+Only in ../data/wikipedia-2: 1073
+Only in ../data/wikipedia-2: 1074
+Only in ../data/wikipedia-2: 1075
+Only in ../data/wikipedia-2: 1076
+Only in ../data/wikipedia-2: 1077
+Only in ../data/wikipedia-2: 1078
+Only in ../data/wikipedia-2: 1079
+Only in ../data/wikipedia-2: 108
+Only in ../data/wikipedia-2: 1080
+Only in ../data/wikipedia-2: 1081
+Only in ../data/wikipedia-2: 1082
+Only in ../data/wikipedia-2: 1083
+Only in ../data/wikipedia-2: 1084
+Only in ../data/wikipedia-2: 1085
+Only in ../data/wikipedia-2: 1086
+Only in ../data/wikipedia-2: 1087
+Only in ../data/wikipedia-2: 1088
+Only in ../data/wikipedia-2: 1089
+Only in ../data/wikipedia-2: 109
+Only in ../data/wikipedia-2: 1090
+Only in ../data/wikipedia-2: 1091
+Only in ../data/wikipedia-2: 1092
+Only in ../data/wikipedia-2: 1093
+Only in ../data/wikipedia-2: 1094
+Only in ../data/wikipedia-2: 1095
+Only in ../data/wikipedia-2: 1096
+Only in ../data/wikipedia-2: 1097
+Only in ../data/wikipedia-2: 1098
+Only in ../data/wikipedia-2: 1099
+Only in ../data/wikipedia-2: 11
+Only in ../data/wikipedia-2: 110
+Only in ../data/wikipedia-2: 1100
+Only in ../data/wikipedia-2: 1101
+Only in ../data/wikipedia-2: 1102
+Only in ../data/wikipedia-2: 1103
+Only in ../data/wikipedia-2: 1104
+Only in ../data/wikipedia-2: 1105
+Only in ../data/wikipedia-2: 1106
+Only in ../data/wikipedia-2: 1107
+Only in ../data/wikipedia-2: 1108
+Only in ../data/wikipedia-2: 1109
+Only in ../data/wikipedia-2: 111
+Only in ../data/wikipedia-2: 1110
+Only in ../data/wikipedia-2: 1111
+Only in ../data/wikipedia-2: 1112
+Only in ../data/wikipedia-2: 1113
+Only in ../data/wikipedia-2: 1114
+Only in ../data/wikipedia-2: 1115
+Only in ../data/wikipedia-2: 1116
+Only in ../data/wikipedia-2: 1117
+Only in ../data/wikipedia-2: 1118
+Only in ../data/wikipedia-2: 1119
+Only in ../data/wikipedia-2: 112
+Only in ../data/wikipedia-2: 1120
+Only in ../data/wikipedia-2: 1121
+Only in ../data/wikipedia-2: 1122
+Only in ../data/wikipedia-2: 1123
+Only in ../data/wikipedia-2: 1124
+Only in ../data/wikipedia-2: 1125
+Only in ../data/wikipedia-2: 1126
+Only in ../data/wikipedia-2: 1127
+Only in ../data/wikipedia-2: 1128
+Only in ../data/wikipedia-2: 1129
+Only in ../data/wikipedia-2: 113
+Only in ../data/wikipedia-2: 1130
+Only in ../data/wikipedia-2: 1131
+Only in ../data/wikipedia-2: 1132
+Only in ../data/wikipedia-2: 1133
+Only in ../data/wikipedia-2: 1134
+Only in ../data/wikipedia-2: 1135
+Only in ../data/wikipedia-2: 1136
+Only in ../data/wikipedia-2: 1137
+Only in ../data/wikipedia-2: 1138
+Only in ../data/wikipedia-2: 1139
+Only in ../data/wikipedia-2: 114
+Only in ../data/wikipedia-2: 1140
+Only in ../data/wikipedia-2: 1141
+Only in ../data/wikipedia-2: 1142
+Only in ../data/wikipedia-2: 1143
+Only in ../data/wikipedia-2: 1144
+Only in ../data/wikipedia-2: 1145
+Only in ../data/wikipedia-2: 1146
+Only in ../data/wikipedia-2: 1147
+Only in ../data/wikipedia-2: 1148
+Only in ../data/wikipedia-2: 1149
+Only in ../data/wikipedia-2: 115
+Only in ../data/wikipedia-2: 1150
+Only in ../data/wikipedia-2: 1151
+Only in ../data/wikipedia-2: 1152
+Only in ../data/wikipedia-2: 1153
+Only in ../data/wikipedia-2: 1154
+Only in ../data/wikipedia-2: 1155
+Only in ../data/wikipedia-2: 1156
+Only in ../data/wikipedia-2: 1157
+Only in ../data/wikipedia-2: 1158
+Only in ../data/wikipedia-2: 1159
+Only in ../data/wikipedia-2: 116
+Only in ../data/wikipedia-2: 1160
+Only in ../data/wikipedia-2: 1161
+Only in ../data/wikipedia-2: 1162
+Only in ../data/wikipedia-2: 1163
+Only in ../data/wikipedia-2: 1164
+Only in ../data/wikipedia-2: 1165
+Only in ../data/wikipedia-2: 1166
+Only in ../data/wikipedia-2: 1167
+Only in ../data/wikipedia-2: 1168
+Only in ../data/wikipedia-2: 1169
+Only in ../data/wikipedia-2: 117
+Only in ../data/wikipedia-2: 1170
+Only in ../data/wikipedia-2: 1171
+Only in ../data/wikipedia-2: 1172
+Only in ../data/wikipedia-2: 1173
+Only in ../data/wikipedia-2: 1174
+Only in ../data/wikipedia-2: 1175
+Only in ../data/wikipedia-2: 1176
+Only in ../data/wikipedia-2: 1177
+Only in ../data/wikipedia-2: 1178
+Only in ../data/wikipedia-2: 1179
+Only in ../data/wikipedia-2: 118
+Only in ../data/wikipedia-2: 1180
+Only in ../data/wikipedia-2: 1181
+Only in ../data/wikipedia-2: 1182
+Only in ../data/wikipedia-2: 1183
+Only in ../data/wikipedia-2: 1184
+Only in ../data/wikipedia-2: 1185
+Only in ../data/wikipedia-2: 1186
+Only in ../data/wikipedia-2: 1187
+Only in ../data/wikipedia-2: 1188
+Only in ../data/wikipedia-2: 1189
+Only in ../data/wikipedia-2: 119
+Only in ../data/wikipedia-2: 1190
+Only in ../data/wikipedia-2: 1191
+Only in ../data/wikipedia-2: 1192
+Only in ../data/wikipedia-2: 1193
+Only in ../data/wikipedia-2: 1194
+Only in ../data/wikipedia-2: 1195
+Only in ../data/wikipedia-2: 1196
+Only in ../data/wikipedia-2: 1197
+Only in ../data/wikipedia-2: 1198
+Only in ../data/wikipedia-2: 1199
+Only in ../data/wikipedia-2: 12
+Only in ../data/wikipedia-2: 120
+Only in ../data/wikipedia-2: 1200
+Only in ../data/wikipedia-2: 1201
+Only in ../data/wikipedia-2: 1202
+Only in ../data/wikipedia-2: 1203
+Only in ../data/wikipedia-2: 1204
+Only in ../data/wikipedia-2: 1205
+Only in ../data/wikipedia-2: 1206
+Only in ../data/wikipedia-2: 1207
+Only in ../data/wikipedia-2: 1208
+Only in ../data/wikipedia-2: 1209
+Only in ../data/wikipedia-2: 121
+Only in ../data/wikipedia-2: 1210
+Only in ../data/wikipedia-2: 1211
+Only in ../data/wikipedia-2: 1212
+Only in ../data/wikipedia-2: 1213
+Only in ../data/wikipedia-2: 1214
+Only in ../data/wikipedia-2: 1215
+Only in ../data/wikipedia-2: 1216
+Only in ../data/wikipedia-2: 1217
+Only in ../data/wikipedia-2: 1218
+Only in ../data/wikipedia-2: 1219
+Only in ../data/wikipedia-2: 122
+Only in ../data/wikipedia-2: 1220
+Only in ../data/wikipedia-2: 1221
+Only in ../data/wikipedia-2: 1222
+Only in ../data/wikipedia-2: 1223
+Only in ../data/wikipedia-2: 1224
+Only in ../data/wikipedia-2: 1225
+Only in ../data/wikipedia-2: 1226
+Only in ../data/wikipedia-2: 1227
+Only in ../data/wikipedia-2: 1228
+Only in ../data/wikipedia-2: 1229
+Only in ../data/wikipedia-2: 123
+Only in ../data/wikipedia-2: 1230
+Only in ../data/wikipedia-2: 1231
+Only in ../data/wikipedia-2: 1232
+Only in ../data/wikipedia-2: 1233
+Only in ../data/wikipedia-2: 1234
+Only in ../data/wikipedia-2: 1235
+Only in ../data/wikipedia-2: 1236
+Only in ../data/wikipedia-2: 1237
+Only in ../data/wikipedia-2: 1238
+Only in ../data/wikipedia-2: 1239
+Only in ../data/wikipedia-2: 124
+Only in ../data/wikipedia-2: 1240
+Only in ../data/wikipedia-2: 1241
+Only in ../data/wikipedia-2: 1242
+Only in ../data/wikipedia-2: 1243
+Only in ../data/wikipedia-2: 1244
+Only in ../data/wikipedia-2: 1245
+Only in ../data/wikipedia-2: 1246
+Only in ../data/wikipedia-2: 1247
+Only in ../data/wikipedia-2: 1248
+Only in ../data/wikipedia-2: 1249
+Only in ../data/wikipedia-2: 125
+Only in ../data/wikipedia-2: 1250
+Only in ../data/wikipedia-2: 1251
+Only in ../data/wikipedia-2: 1252
+Only in ../data/wikipedia-2: 1253
+Only in ../data/wikipedia-2: 1254
+Only in ../data/wikipedia-2: 1255
+Only in ../data/wikipedia-2: 1256
+Only in ../data/wikipedia-2: 1257
+Only in ../data/wikipedia-2: 1258
+Only in ../data/wikipedia-2: 1259
+Only in ../data/wikipedia-2: 126
+Only in ../data/wikipedia-2: 1260
+Only in ../data/wikipedia-2: 1261
+Only in ../data/wikipedia-2: 1262
+Only in ../data/wikipedia-2: 1263
+Only in ../data/wikipedia-2: 1264
+Only in ../data/wikipedia-2: 1265
+Only in ../data/wikipedia-2: 1266
+Only in ../data/wikipedia-2: 1267
+Only in ../data/wikipedia-2: 1268
+Only in ../data/wikipedia-2: 1269
+Only in ../data/wikipedia-2: 127
+Only in ../data/wikipedia-2: 1270
+Only in ../data/wikipedia-2: 1271
+Only in ../data/wikipedia-2: 1272
+Only in ../data/wikipedia-2: 1273
+Only in ../data/wikipedia-2: 1274
+Only in ../data/wikipedia-2: 1275
+Only in ../data/wikipedia-2: 1276
+Only in ../data/wikipedia-2: 1277
+Only in ../data/wikipedia-2: 1278
+Only in ../data/wikipedia-2: 1279
+Only in ../data/wikipedia-2: 128
+Only in ../data/wikipedia-2: 1280
+Only in ../data/wikipedia-2: 1281
+Only in ../data/wikipedia-2: 1282
+Only in ../data/wikipedia-2: 1283
+Only in ../data/wikipedia-2: 1284
+Only in ../data/wikipedia-2: 1285
+Only in ../data/wikipedia-2: 1286
+Only in ../data/wikipedia-2: 1287
+Only in ../data/wikipedia-2: 1288
+Only in ../data/wikipedia-2: 1289
+Only in ../data/wikipedia-2: 129
+Only in ../data/wikipedia-2: 1290
+Only in ../data/wikipedia-2: 1291
+Only in ../data/wikipedia-2: 1292
+Only in ../data/wikipedia-2: 1293
+Only in ../data/wikipedia-2: 1294
+Only in ../data/wikipedia-2: 1295
+Only in ../data/wikipedia-2: 1296
+Only in ../data/wikipedia-2: 1297
+Only in ../data/wikipedia-2: 1298
+Only in ../data/wikipedia-2: 1299
+Only in ../data/wikipedia-2: 13
+Only in ../data/wikipedia-2: 130
+Only in ../data/wikipedia-2: 1300
+Only in ../data/wikipedia-2: 1301
+Only in ../data/wikipedia-2: 1302
+Only in ../data/wikipedia-2: 1303
+Only in ../data/wikipedia-2: 1304
+Only in ../data/wikipedia-2: 1305
+Only in ../data/wikipedia-2: 1306
+Only in ../data/wikipedia-2: 1307
+Only in ../data/wikipedia-2: 1308
+Only in ../data/wikipedia-2: 1309
+Only in ../data/wikipedia-2: 131
+Only in ../data/wikipedia-2: 1310
+Only in ../data/wikipedia-2: 1311
+Only in ../data/wikipedia-2: 1312
+Only in ../data/wikipedia-2: 1313
+Only in ../data/wikipedia-2: 1314
+Only in ../data/wikipedia-2: 1315
+Only in ../data/wikipedia-2: 1316
+Only in ../data/wikipedia-2: 1317
+Only in ../data/wikipedia-2: 1318
+Only in ../data/wikipedia-2: 1319
+Only in ../data/wikipedia-2: 132
+Only in ../data/wikipedia-2: 1320
+Only in ../data/wikipedia-2: 1321
+Only in ../data/wikipedia-2: 1322
+Only in ../data/wikipedia-2: 1323
+Only in ../data/wikipedia-2: 1324
+Only in ../data/wikipedia-2: 1325
+Only in ../data/wikipedia-2: 1326
+Only in ../data/wikipedia-2: 1327
+Only in ../data/wikipedia-2: 1328
+Only in ../data/wikipedia-2: 1329
+Only in ../data/wikipedia-2: 133
+Only in ../data/wikipedia-2: 1330
+Only in ../data/wikipedia-2: 1331
+Only in ../data/wikipedia-2: 1332
+Only in ../data/wikipedia-2: 1333
+Only in ../data/wikipedia-2: 1334
+Only in ../data/wikipedia-2: 1335
+Only in ../data/wikipedia-2: 1336
+Only in ../data/wikipedia-2: 1337
+Only in ../data/wikipedia-2: 1338
+Only in ../data/wikipedia-2: 1339
+Only in ../data/wikipedia-2: 134
+Only in ../data/wikipedia-2: 1340
+Only in ../data/wikipedia-2: 1341
+Only in ../data/wikipedia-2: 1342
+Only in ../data/wikipedia-2: 1343
+Only in ../data/wikipedia-2: 1344
+Only in ../data/wikipedia-2: 1345
+Only in ../data/wikipedia-2: 1346
+Only in ../data/wikipedia-2: 1347
+Only in ../data/wikipedia-2: 1348
+Only in ../data/wikipedia-2: 1349
+Only in ../data/wikipedia-2: 135
+Only in ../data/wikipedia-2: 1350
+Only in ../data/wikipedia-2: 1351
+Only in ../data/wikipedia-2: 1352
+Only in ../data/wikipedia-2: 1353
+Only in ../data/wikipedia-2: 1354
+Only in ../data/wikipedia-2: 1355
+Only in ../data/wikipedia-2: 1356
+Only in ../data/wikipedia-2: 1357
+Only in ../data/wikipedia-2: 1358
+Only in ../data/wikipedia-2: 1359
+Only in ../data/wikipedia-2: 136
+Only in ../data/wikipedia-2: 1360
+Only in ../data/wikipedia-2: 1361
+Only in ../data/wikipedia-2: 1362
+Only in ../data/wikipedia-2: 1363
+Only in ../data/wikipedia-2: 1364
+Only in ../data/wikipedia-2: 1365
+Only in ../data/wikipedia-2: 1366
+Only in ../data/wikipedia-2: 1367
+Only in ../data/wikipedia-2: 1368
+Only in ../data/wikipedia-2: 1369
+Only in ../data/wikipedia-2: 137
+Only in ../data/wikipedia-2: 1370
+Only in ../data/wikipedia-2: 1371
+Only in ../data/wikipedia-2: 1372
+Only in ../data/wikipedia-2: 1373
+Only in ../data/wikipedia-2: 1374
+Only in ../data/wikipedia-2: 1375
+Only in ../data/wikipedia-2: 1376
+Only in ../data/wikipedia-2: 1377
+Only in ../data/wikipedia-2: 1378
+Only in ../data/wikipedia-2: 1379
+Only in ../data/wikipedia-2: 138
+Only in ../data/wikipedia-2: 1380
+Only in ../data/wikipedia-2: 1381
+Only in ../data/wikipedia-2: 1382
+Only in ../data/wikipedia-2: 1383
+Only in ../data/wikipedia-2: 1384
+Only in ../data/wikipedia-2: 1385
+Only in ../data/wikipedia-2: 1386
+Only in ../data/wikipedia-2: 1387
+Only in ../data/wikipedia-2: 1388
+Only in ../data/wikipedia-2: 1389
+Only in ../data/wikipedia-2: 139
+Only in ../data/wikipedia-2: 1390
+Only in ../data/wikipedia-2: 1391
+Only in ../data/wikipedia-2: 1392
+Only in ../data/wikipedia-2: 1393
+Only in ../data/wikipedia-2: 1394
+Only in ../data/wikipedia-2: 1395
+Only in ../data/wikipedia-2: 1396
+Only in ../data/wikipedia-2: 1397
+Only in ../data/wikipedia-2: 1398
+Only in ../data/wikipedia-2: 1399
+Only in ../data/wikipedia-2: 14
+Only in ../data/wikipedia-2: 140
+Only in ../data/wikipedia-2: 1400
+Only in ../data/wikipedia-2: 1401
+Only in ../data/wikipedia-2: 1402
+Only in ../data/wikipedia-2: 1403
+Only in ../data/wikipedia-2: 1404
+Only in ../data/wikipedia-2: 1405
+Only in ../data/wikipedia-2: 1406
+Only in ../data/wikipedia-2: 1407
+Only in ../data/wikipedia-2: 1408
+Only in ../data/wikipedia-2: 1409
+Only in ../data/wikipedia-2: 141
+Only in ../data/wikipedia-2: 1410
+Only in ../data/wikipedia-2: 1411
+Only in ../data/wikipedia-2: 1412
+Only in ../data/wikipedia-2: 1413
+Only in ../data/wikipedia-2: 1414
+Only in ../data/wikipedia-2: 1415
+Only in ../data/wikipedia-2: 1416
+Only in ../data/wikipedia-2: 1417
+Only in ../data/wikipedia-2: 1418
+Only in ../data/wikipedia-2: 1419
+Only in ../data/wikipedia-2: 142
+Only in ../data/wikipedia-2: 1420
+Only in ../data/wikipedia-2: 1421
+Only in ../data/wikipedia-2: 1422
+Only in ../data/wikipedia-2: 1423
+Only in ../data/wikipedia-2: 1424
+Only in ../data/wikipedia-2: 1425
+Only in ../data/wikipedia-2: 1426
+Only in ../data/wikipedia-2: 1427
+Only in ../data/wikipedia-2: 1428
+Only in ../data/wikipedia-2: 1429
+Only in ../data/wikipedia-2: 143
+Only in ../data/wikipedia-2: 1430
+Only in ../data/wikipedia-2: 1431
+Only in ../data/wikipedia-2: 1432
+Only in ../data/wikipedia-2: 1433
+Only in ../data/wikipedia-2: 1434
+Only in ../data/wikipedia-2: 1435
+Only in ../data/wikipedia-2: 1436
+Only in ../data/wikipedia-2: 1437
+Only in ../data/wikipedia-2: 1438
+Only in ../data/wikipedia-2: 1439
+Only in ../data/wikipedia-2: 144
+Only in ../data/wikipedia-2: 1440
+Only in ../data/wikipedia-2: 1441
+Only in ../data/wikipedia-2: 1442
+Only in ../data/wikipedia-2: 1443
+Only in ../data/wikipedia-2: 1444
+Only in ../data/wikipedia-2: 1445
+Only in ../data/wikipedia-2: 1446
+Only in ../data/wikipedia-2: 1447
+Only in ../data/wikipedia-2: 1448
+Only in ../data/wikipedia-2: 1449
+Only in ../data/wikipedia-2: 145
+Only in ../data/wikipedia-2: 1450
+Only in ../data/wikipedia-2: 1451
+Only in ../data/wikipedia-2: 1452
+Only in ../data/wikipedia-2: 1453
+Only in ../data/wikipedia-2: 1454
+Only in ../data/wikipedia-2: 1455
+Only in ../data/wikipedia-2: 1456
+Only in ../data/wikipedia-2: 1457
+Only in ../data/wikipedia-2: 1458
+Only in ../data/wikipedia-2: 1459
+Only in ../data/wikipedia-2: 146
+Only in ../data/wikipedia-2: 1460
+Only in ../data/wikipedia-2: 1461
+Only in ../data/wikipedia-2: 1462
+Only in ../data/wikipedia-2: 1463
+Only in ../data/wikipedia-2: 1464
+Only in ../data/wikipedia-2: 1465
+Only in ../data/wikipedia-2: 1466
+Only in ../data/wikipedia-2: 1467
+Only in ../data/wikipedia-2: 1468
+Only in ../data/wikipedia-2: 1469
+Only in ../data/wikipedia-2: 147
+Only in ../data/wikipedia-2: 1470
+Only in ../data/wikipedia-2: 1471
+Only in ../data/wikipedia-2: 1472
+Only in ../data/wikipedia-2: 1473
+Only in ../data/wikipedia-2: 1474
+Only in ../data/wikipedia-2: 1475
+Only in ../data/wikipedia-2: 1476
+Only in ../data/wikipedia-2: 1477
+Only in ../data/wikipedia-2: 1478
+Only in ../data/wikipedia-2: 1479
+Only in ../data/wikipedia-2: 148
+Only in ../data/wikipedia-2: 1480
+Only in ../data/wikipedia-2: 1481
+Only in ../data/wikipedia-2: 1482
+Only in ../data/wikipedia-2: 1483
+Only in ../data/wikipedia-2: 1484
+Only in ../data/wikipedia-2: 1485
+Only in ../data/wikipedia-2: 1486
+Only in ../data/wikipedia-2: 1487
+Only in ../data/wikipedia-2: 1488
+Only in ../data/wikipedia-2: 1489
+Only in ../data/wikipedia-2: 149
+Only in ../data/wikipedia-2: 1490
+Only in ../data/wikipedia-2: 1491
+Only in ../data/wikipedia-2: 1492
+Only in ../data/wikipedia-2: 1493
+Only in ../data/wikipedia-2: 1494
+Only in ../data/wikipedia-2: 1495
+Only in ../data/wikipedia-2: 1496
+Only in ../data/wikipedia-2: 1497
+Only in ../data/wikipedia-2: 1498
+Only in ../data/wikipedia-2: 1499
+Only in ../data/wikipedia-2: 15
+Only in ../data/wikipedia-2: 150
+Only in ../data/wikipedia-2: 1500
+Only in ../data/wikipedia-2: 1501
+Only in ../data/wikipedia-2: 1502
+Only in ../data/wikipedia-2: 1503
+Only in ../data/wikipedia-2: 1504
+Only in ../data/wikipedia-2: 1505
+Only in ../data/wikipedia-2: 1506
+Only in ../data/wikipedia-2: 1507
+Only in ../data/wikipedia-2: 1508
+Only in ../data/wikipedia-2: 1509
+Only in ../data/wikipedia-2: 151
+Only in ../data/wikipedia-2: 1510
+Only in ../data/wikipedia-2: 1511
+Only in ../data/wikipedia-2: 1512
+Only in ../data/wikipedia-2: 1513
+Only in ../data/wikipedia-2: 1514
+Only in ../data/wikipedia-2: 1515
+Only in ../data/wikipedia-2: 1516
+Only in ../data/wikipedia-2: 1517
+Only in ../data/wikipedia-2: 1518
+Only in ../data/wikipedia-2: 1519
+Only in ../data/wikipedia-2: 152
+Only in ../data/wikipedia-2: 1520
+Only in ../data/wikipedia-2: 1521
+Only in ../data/wikipedia-2: 1522
+Only in ../data/wikipedia-2: 1523
+Only in ../data/wikipedia-2: 1524
+Only in ../data/wikipedia-2: 1525
+Only in ../data/wikipedia-2: 1526
+Only in ../data/wikipedia-2: 1527
+Only in ../data/wikipedia-2: 1528
+Only in ../data/wikipedia-2: 1529
+Only in ../data/wikipedia-2: 153
+Only in ../data/wikipedia-2: 1530
+Only in ../data/wikipedia-2: 1531
+Only in ../data/wikipedia-2: 1532
+Only in ../data/wikipedia-2: 1533
+Only in ../data/wikipedia-2: 1534
+Only in ../data/wikipedia-2: 1535
+Only in ../data/wikipedia-2: 1536
+Only in ../data/wikipedia-2: 1537
+Only in ../data/wikipedia-2: 1538
+Only in ../data/wikipedia-2: 1539
+Only in ../data/wikipedia-2: 154
+Only in ../data/wikipedia-2: 1540
+Only in ../data/wikipedia-2: 1541
+Only in ../data/wikipedia-2: 1542
+Only in ../data/wikipedia-2: 1543
+Only in ../data/wikipedia-2: 1544
+Only in ../data/wikipedia-2: 1545
+Only in ../data/wikipedia-2: 1546
+Only in ../data/wikipedia-2: 1547
+Only in ../data/wikipedia-2: 1548
+Only in ../data/wikipedia-2: 1549
+Only in ../data/wikipedia-2: 155
+Only in ../data/wikipedia-2: 1550
+Only in ../data/wikipedia-2: 1551
+Only in ../data/wikipedia-2: 1552
+Only in ../data/wikipedia-2: 1553
+Only in ../data/wikipedia-2: 1554
+Only in ../data/wikipedia-2: 1555
+Only in ../data/wikipedia-2: 1556
+Only in ../data/wikipedia-2: 1557
+Only in ../data/wikipedia-2: 1558
+Only in ../data/wikipedia-2: 1559
+Only in ../data/wikipedia-2: 156
+Only in ../data/wikipedia-2: 1560
+Only in ../data/wikipedia-2: 1561
+Only in ../data/wikipedia-2: 1562
+Only in ../data/wikipedia-2: 1563
+Only in ../data/wikipedia-2: 1564
+Only in ../data/wikipedia-2: 1565
+Only in ../data/wikipedia-2: 1566
+Only in ../data/wikipedia-2: 1567
+Only in ../data/wikipedia-2: 1568
+Only in ../data/wikipedia-2: 1569
+Only in ../data/wikipedia-2: 157
+Only in ../data/wikipedia-2: 1570
+Only in ../data/wikipedia-2: 1571
+Only in ../data/wikipedia-2: 1572
+Only in ../data/wikipedia-2: 1573
+Only in ../data/wikipedia-2: 1574
+Only in ../data/wikipedia-2: 1575
+Only in ../data/wikipedia-2: 1576
+Only in ../data/wikipedia-2: 1577
+Only in ../data/wikipedia-2: 1578
+Only in ../data/wikipedia-2: 1579
+Only in ../data/wikipedia-2: 158
+Only in ../data/wikipedia-2: 1580
+Only in ../data/wikipedia-2: 1581
+Only in ../data/wikipedia-2: 1582
+Only in ../data/wikipedia-2: 1583
+Only in ../data/wikipedia-2: 1584
+Only in ../data/wikipedia-2: 1585
+Only in ../data/wikipedia-2: 1586
+Only in ../data/wikipedia-2: 1587
+Only in ../data/wikipedia-2: 1588
+Only in ../data/wikipedia-2: 1589
+Only in ../data/wikipedia-2: 159
+Only in ../data/wikipedia-2: 1590
+Only in ../data/wikipedia-2: 1591
+Only in ../data/wikipedia-2: 1592
+Only in ../data/wikipedia-2: 1593
+Only in ../data/wikipedia-2: 1594
+Only in ../data/wikipedia-2: 1595
+Only in ../data/wikipedia-2: 1596
+Only in ../data/wikipedia-2: 1597
+Only in ../data/wikipedia-2: 1598
+Only in ../data/wikipedia-2: 1599
+Only in ../data/wikipedia-2: 16
+Only in ../data/wikipedia-2: 160
+Only in ../data/wikipedia-2: 1600
+Only in ../data/wikipedia-2: 1601
+Only in ../data/wikipedia-2: 1602
+Only in ../data/wikipedia-2: 1603
+Only in ../data/wikipedia-2: 1604
+Only in ../data/wikipedia-2: 1605
+Only in ../data/wikipedia-2: 1606
+Only in ../data/wikipedia-2: 1607
+Only in ../data/wikipedia-2: 1608
+Only in ../data/wikipedia-2: 1609
+Only in ../data/wikipedia-2: 161
+Only in ../data/wikipedia-2: 1610
+Only in ../data/wikipedia-2: 1611
+Only in ../data/wikipedia-2: 1612
+Only in ../data/wikipedia-2: 1613
+Only in ../data/wikipedia-2: 1614
+Only in ../data/wikipedia-2: 1615
+Only in ../data/wikipedia-2: 1616
+Only in ../data/wikipedia-2: 1617
+Only in ../data/wikipedia-2: 1618
+Only in ../data/wikipedia-2: 1619
+Only in ../data/wikipedia-2: 162
+Only in ../data/wikipedia-2: 1620
+Only in ../data/wikipedia-2: 1621
+Only in ../data/wikipedia-2: 1622
+Only in ../data/wikipedia-2: 1623
+Only in ../data/wikipedia-2: 1624
+Only in ../data/wikipedia-2: 1625
+Only in ../data/wikipedia-2: 1626
+Only in ../data/wikipedia-2: 1627
+Only in ../data/wikipedia-2: 1628
+Only in ../data/wikipedia-2: 1629
+Only in ../data/wikipedia-2: 163
+Only in ../data/wikipedia-2: 1630
+Only in ../data/wikipedia-2: 1631
+Only in ../data/wikipedia-2: 1632
+Only in ../data/wikipedia-2: 1633
+Only in ../data/wikipedia-2: 1634
+Only in ../data/wikipedia-2: 1635
+Only in ../data/wikipedia-2: 1636
+Only in ../data/wikipedia-2: 1637
+Only in ../data/wikipedia-2: 1638
+Only in ../data/wikipedia-2: 1639
+Only in ../data/wikipedia-2: 164
+Only in ../data/wikipedia-2: 1640
+Only in ../data/wikipedia-2: 1641
+Only in ../data/wikipedia-2: 1642
+Only in ../data/wikipedia-2: 1643
+Only in ../data/wikipedia-2: 1644
+Only in ../data/wikipedia-2: 1645
+Only in ../data/wikipedia-2: 1646
+Only in ../data/wikipedia-2: 1647
+Only in ../data/wikipedia-2: 1648
+Only in ../data/wikipedia-2: 1649
+Only in ../data/wikipedia-2: 165
+Only in ../data/wikipedia-2: 1650
+Only in ../data/wikipedia-2: 1651
+Only in ../data/wikipedia-2: 1652
+Only in ../data/wikipedia-2: 1653
+Only in ../data/wikipedia-2: 1654
+Only in ../data/wikipedia-2: 1655
+Only in ../data/wikipedia-2: 1656
+Only in ../data/wikipedia-2: 1657
+Only in ../data/wikipedia-2: 1658
+Only in ../data/wikipedia-2: 1659
+Only in ../data/wikipedia-2: 166
+Only in ../data/wikipedia-2: 1660
+Only in ../data/wikipedia-2: 1661
+Only in ../data/wikipedia-2: 1662
+Only in ../data/wikipedia-2: 1663
+Only in ../data/wikipedia-2: 1664
+Only in ../data/wikipedia-2: 1665
+Only in ../data/wikipedia-2: 1666
+Only in ../data/wikipedia-2: 1667
+Only in ../data/wikipedia-2: 1668
+Only in ../data/wikipedia-2: 1669
+Only in ../data/wikipedia-2: 167
+Only in ../data/wikipedia-2: 1670
+Only in ../data/wikipedia-2: 1671
+Only in ../data/wikipedia-2: 1672
+Only in ../data/wikipedia-2: 1673
+Only in ../data/wikipedia-2: 1674
+Only in ../data/wikipedia-2: 1675
+Only in ../data/wikipedia-2: 168
+Only in ../data/wikipedia-2: 169
+Only in ../data/wikipedia-2: 17
+Only in ../data/wikipedia-2: 170
+Only in ../data/wikipedia-2: 171
+Only in ../data/wikipedia-2: 172
+Only in ../data/wikipedia-2: 173
+Only in ../data/wikipedia-2: 174
+Only in ../data/wikipedia-2: 175
+Only in ../data/wikipedia-2: 176
+Only in ../data/wikipedia-2: 177
+Only in ../data/wikipedia-2: 178
+Only in ../data/wikipedia-2: 179
+Only in ../data/wikipedia-2: 18
+Only in ../data/wikipedia-2: 180
+Only in ../data/wikipedia-2: 181
+Only in ../data/wikipedia-2: 182
+Only in ../data/wikipedia-2: 183
+Only in ../data/wikipedia-2: 184
+Only in ../data/wikipedia-2: 185
+Only in ../data/wikipedia-2: 186
+Only in ../data/wikipedia-2: 187
+Only in ../data/wikipedia-2: 188
+Only in ../data/wikipedia-2: 189
+Only in ../data/wikipedia-2: 19
+Only in ../data/wikipedia-2: 190
+Only in ../data/wikipedia-2: 191
+Only in ../data/wikipedia-2: 192
+Only in ../data/wikipedia-2: 193
+Only in ../data/wikipedia-2: 194
+Only in ../data/wikipedia-2: 195
+Only in ../data/wikipedia-2: 196
+Only in ../data/wikipedia-2: 197
+Only in ../data/wikipedia-2: 198
+Only in ../data/wikipedia-2: 199
+Only in ../data/wikipedia-2: 2
+Only in ../data/wikipedia-2: 20
+Only in ../data/wikipedia-2: 200
+Only in ../data/wikipedia-2: 201
+Only in ../data/wikipedia-2: 202
+Only in ../data/wikipedia-2: 203
+Only in ../data/wikipedia-2: 204
+Only in ../data/wikipedia-2: 205
+Only in ../data/wikipedia-2: 206
+Only in ../data/wikipedia-2: 207
+Only in ../data/wikipedia-2: 208
+Only in ../data/wikipedia-2: 209
+Only in ../data/wikipedia-2: 21
+Only in ../data/wikipedia-2: 210
+Only in ../data/wikipedia-2: 211
+Only in ../data/wikipedia-2: 212
+Only in ../data/wikipedia-2: 213
+Only in ../data/wikipedia-2: 214
+Only in ../data/wikipedia-2: 215
+Only in ../data/wikipedia-2: 216
+Only in ../data/wikipedia-2: 217
+Only in ../data/wikipedia-2: 218
+Only in ../data/wikipedia-2: 219
+Only in ../data/wikipedia-2: 22
+Only in ../data/wikipedia-2: 220
+Only in ../data/wikipedia-2: 221
+Only in ../data/wikipedia-2: 222
+Only in ../data/wikipedia-2: 223
+Only in ../data/wikipedia-2: 224
+Only in ../data/wikipedia-2: 225
+Only in ../data/wikipedia-2: 226
+Only in ../data/wikipedia-2: 227
+Only in ../data/wikipedia-2: 228
+Only in ../data/wikipedia-2: 229
+Only in ../data/wikipedia-2: 23
+Only in ../data/wikipedia-2: 230
+Only in ../data/wikipedia-2: 231
+Only in ../data/wikipedia-2: 232
+Only in ../data/wikipedia-2: 233
+Only in ../data/wikipedia-2: 234
+Only in ../data/wikipedia-2: 235
+Only in ../data/wikipedia-2: 236
+Only in ../data/wikipedia-2: 237
+Only in ../data/wikipedia-2: 238
+Only in ../data/wikipedia-2: 239
+Only in ../data/wikipedia-2: 24
+Only in ../data/wikipedia-2: 240
+Only in ../data/wikipedia-2: 241
+Only in ../data/wikipedia-2: 242
+Only in ../data/wikipedia-2: 243
+Only in ../data/wikipedia-2: 244
+Only in ../data/wikipedia-2: 245
+Only in ../data/wikipedia-2: 246
+Only in ../data/wikipedia-2: 247
+Only in ../data/wikipedia-2: 248
+Only in ../data/wikipedia-2: 249
+Only in ../data/wikipedia-2: 25
+Only in ../data/wikipedia-2: 250
+Only in ../data/wikipedia-2: 251
+Only in ../data/wikipedia-2: 252
+Only in ../data/wikipedia-2: 253
+Only in ../data/wikipedia-2: 254
+Only in ../data/wikipedia-2: 255
+Only in ../data/wikipedia-2: 256
+Only in ../data/wikipedia-2: 257
+Only in ../data/wikipedia-2: 258
+Only in ../data/wikipedia-2: 259
+Only in ../data/wikipedia-2: 26
+Only in ../data/wikipedia-2: 260
+Only in ../data/wikipedia-2: 261
+Only in ../data/wikipedia-2: 262
+Only in ../data/wikipedia-2: 263
+Only in ../data/wikipedia-2: 264
+Only in ../data/wikipedia-2: 265
+Only in ../data/wikipedia-2: 266
+Only in ../data/wikipedia-2: 267
+Only in ../data/wikipedia-2: 268
+Only in ../data/wikipedia-2: 269
+Only in ../data/wikipedia-2: 27
+Only in ../data/wikipedia-2: 270
+Only in ../data/wikipedia-2: 271
+Only in ../data/wikipedia-2: 272
+Only in ../data/wikipedia-2: 273
+Only in ../data/wikipedia-2: 274
+Only in ../data/wikipedia-2: 275
+Only in ../data/wikipedia-2: 276
+Only in ../data/wikipedia-2: 277
+Only in ../data/wikipedia-2: 278
+Only in ../data/wikipedia-2: 279
+Only in ../data/wikipedia-2: 28
+Only in ../data/wikipedia-2: 280
+Only in ../data/wikipedia-2: 281
+Only in ../data/wikipedia-2: 282
+Only in ../data/wikipedia-2: 283
+Only in ../data/wikipedia-2: 284
+Only in ../data/wikipedia-2: 285
+Only in ../data/wikipedia-2: 286
+Only in ../data/wikipedia-2: 287
+Only in ../data/wikipedia-2: 288
+Only in ../data/wikipedia-2: 289
+Only in ../data/wikipedia-2: 29
+Only in ../data/wikipedia-2: 290
+Only in ../data/wikipedia-2: 291
+Only in ../data/wikipedia-2: 292
+Only in ../data/wikipedia-2: 293
+Only in ../data/wikipedia-2: 294
+Only in ../data/wikipedia-2: 295
+Only in ../data/wikipedia-2: 296
+Only in ../data/wikipedia-2: 297
+Only in ../data/wikipedia-2: 298
+Only in ../data/wikipedia-2: 299
+Only in ../data/wikipedia-2: 3
+Only in ../data/wikipedia-2: 30
+Only in ../data/wikipedia-2: 300
+Only in ../data/wikipedia-2: 301
+Only in ../data/wikipedia-2: 302
+Only in ../data/wikipedia-2: 303
+Only in ../data/wikipedia-2: 304
+Only in ../data/wikipedia-2: 305
+Only in ../data/wikipedia-2: 306
+Only in ../data/wikipedia-2: 307
+Only in ../data/wikipedia-2: 308
+Only in ../data/wikipedia-2: 309
+Only in ../data/wikipedia-2: 31
+Only in ../data/wikipedia-2: 310
+Only in ../data/wikipedia-2: 311
+Only in ../data/wikipedia-2: 312
+Only in ../data/wikipedia-2: 313
+Only in ../data/wikipedia-2: 314
+Only in ../data/wikipedia-2: 315
+Only in ../data/wikipedia-2: 316
+Only in ../data/wikipedia-2: 317
+Only in ../data/wikipedia-2: 318
+Only in ../data/wikipedia-2: 319
+Only in ../data/wikipedia-2: 32
+Only in ../data/wikipedia-2: 320
+Only in ../data/wikipedia-2: 321
+Only in ../data/wikipedia-2: 322
+Only in ../data/wikipedia-2: 323
+Only in ../data/wikipedia-2: 324
+Only in ../data/wikipedia-2: 325
+Only in ../data/wikipedia-2: 326
+Only in ../data/wikipedia-2: 327
+Only in ../data/wikipedia-2: 328
+Only in ../data/wikipedia-2: 329
+Only in ../data/wikipedia-2: 33
+Only in ../data/wikipedia-2: 330
+Only in ../data/wikipedia-2: 331
+Only in ../data/wikipedia-2: 332
+Only in ../data/wikipedia-2: 333
+Only in ../data/wikipedia-2: 334
+Only in ../data/wikipedia-2: 335
+Only in ../data/wikipedia-2: 336
+Only in ../data/wikipedia-2: 337
+Only in ../data/wikipedia-2: 338
+Only in ../data/wikipedia-2: 339
+Only in ../data/wikipedia-2: 34
+Only in ../data/wikipedia-2: 340
+Only in ../data/wikipedia-2: 341
+Only in ../data/wikipedia-2: 342
+Only in ../data/wikipedia-2: 343
+Only in ../data/wikipedia-2: 344
+Only in ../data/wikipedia-2: 345
+Only in ../data/wikipedia-2: 346
+Only in ../data/wikipedia-2: 347
+Only in ../data/wikipedia-2: 348
+Only in ../data/wikipedia-2: 349
+Only in ../data/wikipedia-2: 35
+Only in ../data/wikipedia-2: 350
+Only in ../data/wikipedia-2: 351
+Only in ../data/wikipedia-2: 352
+Only in ../data/wikipedia-2: 353
+Only in ../data/wikipedia-2: 354
+Only in ../data/wikipedia-2: 355
+Only in ../data/wikipedia-2: 356
+Only in ../data/wikipedia-2: 357
+Only in ../data/wikipedia-2: 358
+Only in ../data/wikipedia-2: 359
+Only in ../data/wikipedia-2: 36
+Only in ../data/wikipedia-2: 360
+Only in ../data/wikipedia-2: 361
+Only in ../data/wikipedia-2: 362
+Only in ../data/wikipedia-2: 363
+Only in ../data/wikipedia-2: 364
+Only in ../data/wikipedia-2: 365
+Only in ../data/wikipedia-2: 366
+Only in ../data/wikipedia-2: 367
+Only in ../data/wikipedia-2: 368
+Only in ../data/wikipedia-2: 369
+Only in ../data/wikipedia-2: 37
+Only in ../data/wikipedia-2: 370
+Only in ../data/wikipedia-2: 371
+Only in ../data/wikipedia-2: 372
+Only in ../data/wikipedia-2: 373
+Only in ../data/wikipedia-2: 374
+Only in ../data/wikipedia-2: 375
+Only in ../data/wikipedia-2: 376
+Only in ../data/wikipedia-2: 377
+Only in ../data/wikipedia-2: 378
+Only in ../data/wikipedia-2: 379
+Only in ../data/wikipedia-2: 38
+Only in ../data/wikipedia-2: 380
+Only in ../data/wikipedia-2: 381
+Only in ../data/wikipedia-2: 382
+Only in ../data/wikipedia-2: 383
+Only in ../data/wikipedia-2: 384
+Only in ../data/wikipedia-2: 385
+Only in ../data/wikipedia-2: 386
+Only in ../data/wikipedia-2: 387
+Only in ../data/wikipedia-2: 388
+Only in ../data/wikipedia-2: 389
+Only in ../data/wikipedia-2: 39
+Only in ../data/wikipedia-2: 390
+Only in ../data/wikipedia-2: 391
+Only in ../data/wikipedia-2: 392
+Only in ../data/wikipedia-2: 393
+Only in ../data/wikipedia-2: 394
+Only in ../data/wikipedia-2: 395
+Only in ../data/wikipedia-2: 396
+Only in ../data/wikipedia-2: 397
+Only in ../data/wikipedia-2: 398
+Only in ../data/wikipedia-2: 399
+Only in ../data/wikipedia-2: 4
+Only in ../data/wikipedia-2: 40
+Only in ../data/wikipedia-2: 400
+Only in ../data/wikipedia-2: 401
+Only in ../data/wikipedia-2: 402
+Only in ../data/wikipedia-2: 403
+Only in ../data/wikipedia-2: 404
+Only in ../data/wikipedia-2: 405
+Only in ../data/wikipedia-2: 406
+Only in ../data/wikipedia-2: 407
+Only in ../data/wikipedia-2: 408
+Only in ../data/wikipedia-2: 409
+Only in ../data/wikipedia-2: 41
+Only in ../data/wikipedia-2: 410
+Only in ../data/wikipedia-2: 411
+Only in ../data/wikipedia-2: 412
+Only in ../data/wikipedia-2: 413
+Only in ../data/wikipedia-2: 414
+Only in ../data/wikipedia-2: 415
+Only in ../data/wikipedia-2: 416
+Only in ../data/wikipedia-2: 417
+Only in ../data/wikipedia-2: 418
+Only in ../data/wikipedia-2: 419
+Only in ../data/wikipedia-2: 42
+Only in ../data/wikipedia-2: 420
+Only in ../data/wikipedia-2: 421
+Only in ../data/wikipedia-2: 422
+Only in ../data/wikipedia-2: 423
+Only in ../data/wikipedia-2: 424
+Only in ../data/wikipedia-2: 425
+Only in ../data/wikipedia-2: 426
+Only in ../data/wikipedia-2: 427
+Only in ../data/wikipedia-2: 428
+Only in ../data/wikipedia-2: 429
+Only in ../data/wikipedia-2: 43
+Only in ../data/wikipedia-2: 430
+Only in ../data/wikipedia-2: 431
+Only in ../data/wikipedia-2: 432
+Only in ../data/wikipedia-2: 433
+Only in ../data/wikipedia-2: 434
+Only in ../data/wikipedia-2: 435
+Only in ../data/wikipedia-2: 436
+Only in ../data/wikipedia-2: 437
+Only in ../data/wikipedia-2: 438
+Only in ../data/wikipedia-2: 439
+Only in ../data/wikipedia-2: 44
+Only in ../data/wikipedia-2: 440
+Only in ../data/wikipedia-2: 441
+Only in ../data/wikipedia-2: 442
+Only in ../data/wikipedia-2: 443
+Only in ../data/wikipedia-2: 444
+Only in ../data/wikipedia-2: 445
+Only in ../data/wikipedia-2: 446
+Only in ../data/wikipedia-2: 447
+Only in ../data/wikipedia-2: 448
+Only in ../data/wikipedia-2: 449
+Only in ../data/wikipedia-2: 45
+Only in ../data/wikipedia-2: 450
+Only in ../data/wikipedia-2: 451
+Only in ../data/wikipedia-2: 452
+Only in ../data/wikipedia-2: 453
+Only in ../data/wikipedia-2: 454
+Only in ../data/wikipedia-2: 455
+Only in ../data/wikipedia-2: 456
+Only in ../data/wikipedia-2: 457
+Only in ../data/wikipedia-2: 458
+Only in ../data/wikipedia-2: 459
+Only in ../data/wikipedia-2: 46
+Only in ../data/wikipedia-2: 460
+Only in ../data/wikipedia-2: 461
+Only in ../data/wikipedia-2: 462
+Only in ../data/wikipedia-2: 463
+Only in ../data/wikipedia-2: 464
+Only in ../data/wikipedia-2: 465
+Only in ../data/wikipedia-2: 466
+Only in ../data/wikipedia-2: 467
+Only in ../data/wikipedia-2: 468
+Only in ../data/wikipedia-2: 469
+Only in ../data/wikipedia-2: 47
+Only in ../data/wikipedia-2: 470
+Only in ../data/wikipedia-2: 471
+Only in ../data/wikipedia-2: 472
+Only in ../data/wikipedia-2: 473
+Only in ../data/wikipedia-2: 474
+Only in ../data/wikipedia-2: 475
+Only in ../data/wikipedia-2: 476
+Only in ../data/wikipedia-2: 477
+Only in ../data/wikipedia-2: 478
+Only in ../data/wikipedia-2: 479
+Only in ../data/wikipedia-2: 48
+Only in ../data/wikipedia-2: 480
+Only in ../data/wikipedia-2: 481
+Only in ../data/wikipedia-2: 482
+Only in ../data/wikipedia-2: 483
+Only in ../data/wikipedia-2: 484
+Only in ../data/wikipedia-2: 485
+Only in ../data/wikipedia-2: 486
+Only in ../data/wikipedia-2: 487
+Only in ../data/wikipedia-2: 488
+Only in ../data/wikipedia-2: 489
+Only in ../data/wikipedia-2: 49
+Only in ../data/wikipedia-2: 490
+Only in ../data/wikipedia-2: 491
+Only in ../data/wikipedia-2: 492
+Only in ../data/wikipedia-2: 493
+Only in ../data/wikipedia-2: 494
+Only in ../data/wikipedia-2: 495
+Only in ../data/wikipedia-2: 496
+Only in ../data/wikipedia-2: 497
+Only in ../data/wikipedia-2: 498
+Only in ../data/wikipedia-2: 499
+Only in ../data/wikipedia-2: 5
+Only in ../data/wikipedia-2: 50
+Only in ../data/wikipedia-2: 500
+Only in ../data/wikipedia-2: 501
+Only in ../data/wikipedia-2: 502
+Only in ../data/wikipedia-2: 503
+Only in ../data/wikipedia-2: 504
+Only in ../data/wikipedia-2: 505
+Only in ../data/wikipedia-2: 506
+Only in ../data/wikipedia-2: 507
+Only in ../data/wikipedia-2: 508
+Only in ../data/wikipedia-2: 509
+Only in ../data/wikipedia-2: 51
+Only in ../data/wikipedia-2: 510
+Only in ../data/wikipedia-2: 511
+Only in ../data/wikipedia-2: 512
+Only in ../data/wikipedia-2: 513
+Only in ../data/wikipedia-2: 514
+Only in ../data/wikipedia-2: 515
+Only in ../data/wikipedia-2: 516
+Only in ../data/wikipedia-2: 517
+Only in ../data/wikipedia-2: 518
+Only in ../data/wikipedia-2: 519
+Only in ../data/wikipedia-2: 52
+Only in ../data/wikipedia-2: 520
+Only in ../data/wikipedia-2: 521
+Only in ../data/wikipedia-2: 522
+Only in ../data/wikipedia-2: 523
+Only in ../data/wikipedia-2: 524
+Only in ../data/wikipedia-2: 525
+Only in ../data/wikipedia-2: 526
+Only in ../data/wikipedia-2: 527
+Only in ../data/wikipedia-2: 528
+Only in ../data/wikipedia-2: 529
+Only in ../data/wikipedia-2: 53
+Only in ../data/wikipedia-2: 530
+Only in ../data/wikipedia-2: 531
+Only in ../data/wikipedia-2: 532
+Only in ../data/wikipedia-2: 533
+Only in ../data/wikipedia-2: 534
+Only in ../data/wikipedia-2: 535
+Only in ../data/wikipedia-2: 536
+Only in ../data/wikipedia-2: 537
+Only in ../data/wikipedia-2: 538
+Only in ../data/wikipedia-2: 539
+Only in ../data/wikipedia-2: 54
+Only in ../data/wikipedia-2: 540
+Only in ../data/wikipedia-2: 541
+Only in ../data/wikipedia-2: 542
+Only in ../data/wikipedia-2: 543
+Only in ../data/wikipedia-2: 544
+Only in ../data/wikipedia-2: 545
+Only in ../data/wikipedia-2: 546
+Only in ../data/wikipedia-2: 547
+Only in ../data/wikipedia-2: 548
+Only in ../data/wikipedia-2: 549
+Only in ../data/wikipedia-2: 55
+Only in ../data/wikipedia-2: 550
+Only in ../data/wikipedia-2: 551
+Only in ../data/wikipedia-2: 552
+Only in ../data/wikipedia-2: 553
+Only in ../data/wikipedia-2: 554
+Only in ../data/wikipedia-2: 555
+Only in ../data/wikipedia-2: 556
+Only in ../data/wikipedia-2: 557
+Only in ../data/wikipedia-2: 558
+Only in ../data/wikipedia-2: 559
+Only in ../data/wikipedia-2: 56
+Only in ../data/wikipedia-2: 560
+Only in ../data/wikipedia-2: 561
+Only in ../data/wikipedia-2: 562
+Only in ../data/wikipedia-2: 563
+Only in ../data/wikipedia-2: 564
+Only in ../data/wikipedia-2: 565
+Only in ../data/wikipedia-2: 566
+Only in ../data/wikipedia-2: 567
+Only in ../data/wikipedia-2: 568
+Only in ../data/wikipedia-2: 569
+Only in ../data/wikipedia-2: 57
+Only in ../data/wikipedia-2: 570
+Only in ../data/wikipedia-2: 571
+Only in ../data/wikipedia-2: 572
+Only in ../data/wikipedia-2: 573
+Only in ../data/wikipedia-2: 574
+Only in ../data/wikipedia-2: 575
+Only in ../data/wikipedia-2: 576
+Only in ../data/wikipedia-2: 577
+Only in ../data/wikipedia-2: 578
+Only in ../data/wikipedia-2: 579
+Only in ../data/wikipedia-2: 58
+Only in ../data/wikipedia-2: 580
+Only in ../data/wikipedia-2: 581
+Only in ../data/wikipedia-2: 582
+Only in ../data/wikipedia-2: 583
+Only in ../data/wikipedia-2: 584
+Only in ../data/wikipedia-2: 585
+Only in ../data/wikipedia-2: 586
+Only in ../data/wikipedia-2: 587
+Only in ../data/wikipedia-2: 588
+Only in ../data/wikipedia-2: 589
+Only in ../data/wikipedia-2: 59
+Only in ../data/wikipedia-2: 590
+Only in ../data/wikipedia-2: 591
+Only in ../data/wikipedia-2: 592
+Only in ../data/wikipedia-2: 593
+Only in ../data/wikipedia-2: 594
+Only in ../data/wikipedia-2: 595
+Only in ../data/wikipedia-2: 596
+Only in ../data/wikipedia-2: 597
+Only in ../data/wikipedia-2: 598
+Only in ../data/wikipedia-2: 599
+Only in ../data/wikipedia-2: 6
+Only in ../data/wikipedia-2: 60
+Only in ../data/wikipedia-2: 600
+Only in ../data/wikipedia-2: 601
+Only in ../data/wikipedia-2: 602
+Only in ../data/wikipedia-2: 603
+Only in ../data/wikipedia-2: 604
+Only in ../data/wikipedia-2: 605
+Only in ../data/wikipedia-2: 606
+Only in ../data/wikipedia-2: 607
+Only in ../data/wikipedia-2: 608
+Only in ../data/wikipedia-2: 609
+Only in ../data/wikipedia-2: 61
+Only in ../data/wikipedia-2: 610
+Only in ../data/wikipedia-2: 611
+Only in ../data/wikipedia-2: 612
+Only in ../data/wikipedia-2: 613
+Only in ../data/wikipedia-2: 614
+Only in ../data/wikipedia-2: 615
+Only in ../data/wikipedia-2: 616
+Only in ../data/wikipedia-2: 617
+Only in ../data/wikipedia-2: 618
+Only in ../data/wikipedia-2: 619
+Only in ../data/wikipedia-2: 62
+Only in ../data/wikipedia-2: 620
+Only in ../data/wikipedia-2: 621
+Only in ../data/wikipedia-2: 622
+Only in ../data/wikipedia-2: 623
+Only in ../data/wikipedia-2: 624
+Only in ../data/wikipedia-2: 625
+Only in ../data/wikipedia-2: 626
+Only in ../data/wikipedia-2: 627
+Only in ../data/wikipedia-2: 628
+Only in ../data/wikipedia-2: 629
+Only in ../data/wikipedia-2: 63
+Only in ../data/wikipedia-2: 630
+Only in ../data/wikipedia-2: 631
+Only in ../data/wikipedia-2: 632
+Only in ../data/wikipedia-2: 633
+Only in ../data/wikipedia-2: 634
+Only in ../data/wikipedia-2: 635
+Only in ../data/wikipedia-2: 636
+Only in ../data/wikipedia-2: 637
+Only in ../data/wikipedia-2: 638
+Only in ../data/wikipedia-2: 639
+Only in ../data/wikipedia-2: 64
+Only in ../data/wikipedia-2: 640
+Only in ../data/wikipedia-2: 641
+Only in ../data/wikipedia-2: 642
+Only in ../data/wikipedia-2: 643
+Only in ../data/wikipedia-2: 644
+Only in ../data/wikipedia-2: 645
+Only in ../data/wikipedia-2: 646
+Only in ../data/wikipedia-2: 647
+Only in ../data/wikipedia-2: 648
+Only in ../data/wikipedia-2: 649
+Only in ../data/wikipedia-2: 65
+Only in ../data/wikipedia-2: 650
+Only in ../data/wikipedia-2: 651
+Only in ../data/wikipedia-2: 652
+Only in ../data/wikipedia-2: 653
+Only in ../data/wikipedia-2: 654
+Only in ../data/wikipedia-2: 655
+Only in ../data/wikipedia-2: 656
+Only in ../data/wikipedia-2: 657
+Only in ../data/wikipedia-2: 658
+Only in ../data/wikipedia-2: 659
+Only in ../data/wikipedia-2: 66
+Only in ../data/wikipedia-2: 660
+Only in ../data/wikipedia-2: 661
+Only in ../data/wikipedia-2: 662
+Only in ../data/wikipedia-2: 663
+Only in ../data/wikipedia-2: 664
+Only in ../data/wikipedia-2: 665
+Only in ../data/wikipedia-2: 666
+Only in ../data/wikipedia-2: 667
+Only in ../data/wikipedia-2: 668
+Only in ../data/wikipedia-2: 669
+Only in ../data/wikipedia-2: 67
+Only in ../data/wikipedia-2: 670
+Only in ../data/wikipedia-2: 671
+Only in ../data/wikipedia-2: 672
+Only in ../data/wikipedia-2: 673
+Only in ../data/wikipedia-2: 674
+Only in ../data/wikipedia-2: 675
+Only in ../data/wikipedia-2: 676
+Only in ../data/wikipedia-2: 677
+Only in ../data/wikipedia-2: 678
+Only in ../data/wikipedia-2: 679
+Only in ../data/wikipedia-2: 68
+Only in ../data/wikipedia-2: 680
+Only in ../data/wikipedia-2: 681
+Only in ../data/wikipedia-2: 682
+Only in ../data/wikipedia-2: 683
+Only in ../data/wikipedia-2: 684
+Only in ../data/wikipedia-2: 685
+Only in ../data/wikipedia-2: 686
+Only in ../data/wikipedia-2: 687
+Only in ../data/wikipedia-2: 688
+Only in ../data/wikipedia-2: 689
+Only in ../data/wikipedia-2: 69
+Only in ../data/wikipedia-2: 690
+Only in ../data/wikipedia-2: 691
+Only in ../data/wikipedia-2: 692
+Only in ../data/wikipedia-2: 693
+Only in ../data/wikipedia-2: 694
+Only in ../data/wikipedia-2: 695
+Only in ../data/wikipedia-2: 696
+Only in ../data/wikipedia-2: 697
+Only in ../data/wikipedia-2: 698
+Only in ../data/wikipedia-2: 699
+Only in ../data/wikipedia-2: 7
+Only in ../data/wikipedia-2: 70
+Only in ../data/wikipedia-2: 700
+Only in ../data/wikipedia-2: 701
+Only in ../data/wikipedia-2: 702
+Only in ../data/wikipedia-2: 703
+Only in ../data/wikipedia-2: 704
+Only in ../data/wikipedia-2: 705
+Only in ../data/wikipedia-2: 706
+Only in ../data/wikipedia-2: 707
+Only in ../data/wikipedia-2: 708
+Only in ../data/wikipedia-2: 709
+Only in ../data/wikipedia-2: 71
+Only in ../data/wikipedia-2: 710
+Only in ../data/wikipedia-2: 711
+Only in ../data/wikipedia-2: 712
+Only in ../data/wikipedia-2: 713
+Only in ../data/wikipedia-2: 714
+Only in ../data/wikipedia-2: 715
+Only in ../data/wikipedia-2: 716
+Only in ../data/wikipedia-2: 717
+Only in ../data/wikipedia-2: 718
+Only in ../data/wikipedia-2: 719
+Only in ../data/wikipedia-2: 72
+Only in ../data/wikipedia-2: 720
+Only in ../data/wikipedia-2: 721
+Only in ../data/wikipedia-2: 722
+Only in ../data/wikipedia-2: 723
+Only in ../data/wikipedia-2: 724
+Only in ../data/wikipedia-2: 725
+Only in ../data/wikipedia-2: 726
+Only in ../data/wikipedia-2: 727
+Only in ../data/wikipedia-2: 728
+Only in ../data/wikipedia-2: 729
+Only in ../data/wikipedia-2: 73
+Only in ../data/wikipedia-2: 730
+Only in ../data/wikipedia-2: 731
+Only in ../data/wikipedia-2: 732
+Only in ../data/wikipedia-2: 733
+Only in ../data/wikipedia-2: 734
+Only in ../data/wikipedia-2: 735
+Only in ../data/wikipedia-2: 736
+Only in ../data/wikipedia-2: 737
+Only in ../data/wikipedia-2: 738
+Only in ../data/wikipedia-2: 739
+Only in ../data/wikipedia-2: 74
+Only in ../data/wikipedia-2: 740
+Only in ../data/wikipedia-2: 741
+Only in ../data/wikipedia-2: 742
+Only in ../data/wikipedia-2: 743
+Only in ../data/wikipedia-2: 744
+Only in ../data/wikipedia-2: 745
+Only in ../data/wikipedia-2: 746
+Only in ../data/wikipedia-2: 747
+Only in ../data/wikipedia-2: 748
+Only in ../data/wikipedia-2: 749
+Only in ../data/wikipedia-2: 75
+Only in ../data/wikipedia-2: 750
+Only in ../data/wikipedia-2: 751
+Only in ../data/wikipedia-2: 752
+Only in ../data/wikipedia-2: 753
+Only in ../data/wikipedia-2: 754
+Only in ../data/wikipedia-2: 755
+Only in ../data/wikipedia-2: 756
+Only in ../data/wikipedia-2: 757
+Only in ../data/wikipedia-2: 758
+Only in ../data/wikipedia-2: 759
+Only in ../data/wikipedia-2: 76
+Only in ../data/wikipedia-2: 760
+Only in ../data/wikipedia-2: 761
+Only in ../data/wikipedia-2: 762
+Only in ../data/wikipedia-2: 763
+Only in ../data/wikipedia-2: 764
+Only in ../data/wikipedia-2: 765
+Only in ../data/wikipedia-2: 766
+Only in ../data/wikipedia-2: 767
+Only in ../data/wikipedia-2: 768
+Only in ../data/wikipedia-2: 769
+Only in ../data/wikipedia-2: 77
+Only in ../data/wikipedia-2: 770
+Only in ../data/wikipedia-2: 771
+Only in ../data/wikipedia-2: 772
+Only in ../data/wikipedia-2: 773
+Only in ../data/wikipedia-2: 774
+Only in ../data/wikipedia-2: 775
+Only in ../data/wikipedia-2: 776
+Only in ../data/wikipedia-2: 777
+Only in ../data/wikipedia-2: 778
+Only in ../data/wikipedia-2: 779
+Only in ../data/wikipedia-2: 78
+Only in ../data/wikipedia-2: 780
+Only in ../data/wikipedia-2: 781
+Only in ../data/wikipedia-2: 782
+Only in ../data/wikipedia-2: 783
+Only in ../data/wikipedia-2: 784
+Only in ../data/wikipedia-2: 785
+Only in ../data/wikipedia-2: 786
+Only in ../data/wikipedia-2: 787
+Only in ../data/wikipedia-2: 788
+Only in ../data/wikipedia-2: 789
+Only in ../data/wikipedia-2: 79
+Only in ../data/wikipedia-2: 790
+Only in ../data/wikipedia-2: 791
+Only in ../data/wikipedia-2: 792
+Only in ../data/wikipedia-2: 793
+Only in ../data/wikipedia-2: 794
+Only in ../data/wikipedia-2: 795
+Only in ../data/wikipedia-2: 796
+Only in ../data/wikipedia-2: 797
+Only in ../data/wikipedia-2: 798
+Only in ../data/wikipedia-2: 799
+Only in ../data/wikipedia-2: 8
+Only in ../data/wikipedia-2: 80
+Only in ../data/wikipedia-2: 800
+Only in ../data/wikipedia-2: 801
+Only in ../data/wikipedia-2: 802
+Only in ../data/wikipedia-2: 803
+Only in ../data/wikipedia-2: 804
+Only in ../data/wikipedia-2: 805
+Only in ../data/wikipedia-2: 806
+Only in ../data/wikipedia-2: 807
+Only in ../data/wikipedia-2: 808
+Only in ../data/wikipedia-2: 809
+Only in ../data/wikipedia-2: 81
+Only in ../data/wikipedia-2: 810
+Only in ../data/wikipedia-2: 811
+Only in ../data/wikipedia-2: 812
+Only in ../data/wikipedia-2: 813
+Only in ../data/wikipedia-2: 814
+Only in ../data/wikipedia-2: 815
+Only in ../data/wikipedia-2: 816
+Only in ../data/wikipedia-2: 817
+Only in ../data/wikipedia-2: 818
+Only in ../data/wikipedia-2: 819
+Only in ../data/wikipedia-2: 82
+Only in ../data/wikipedia-2: 820
+Only in ../data/wikipedia-2: 821
+Only in ../data/wikipedia-2: 822
+Only in ../data/wikipedia-2: 823
+Only in ../data/wikipedia-2: 824
+Only in ../data/wikipedia-2: 825
+Only in ../data/wikipedia-2: 826
+Only in ../data/wikipedia-2: 827
+Only in ../data/wikipedia-2: 828
+Only in ../data/wikipedia-2: 829
+Only in ../data/wikipedia-2: 83
+Only in ../data/wikipedia-2: 830
+Only in ../data/wikipedia-2: 831
+Only in ../data/wikipedia-2: 832
+Only in ../data/wikipedia-2: 833
+Only in ../data/wikipedia-2: 834
+Only in ../data/wikipedia-2: 835
+Only in ../data/wikipedia-2: 836
+Only in ../data/wikipedia-2: 837
+Only in ../data/wikipedia-2: 838
+Only in ../data/wikipedia-2: 839
+Only in ../data/wikipedia-2: 84
+Only in ../data/wikipedia-2: 840
+Only in ../data/wikipedia-2: 841
+Only in ../data/wikipedia-2: 842
+Only in ../data/wikipedia-2: 843
+Only in ../data/wikipedia-2: 844
+Only in ../data/wikipedia-2: 845
+Only in ../data/wikipedia-2: 846
+Only in ../data/wikipedia-2: 847
+Only in ../data/wikipedia-2: 848
+Only in ../data/wikipedia-2: 849
+Only in ../data/wikipedia-2: 85
+Only in ../data/wikipedia-2: 850
+Only in ../data/wikipedia-2: 851
+Only in ../data/wikipedia-2: 852
+Only in ../data/wikipedia-2: 853
+Only in ../data/wikipedia-2: 854
+Only in ../data/wikipedia-2: 855
+Only in ../data/wikipedia-2: 856
+Only in ../data/wikipedia-2: 857
+Only in ../data/wikipedia-2: 858
+Only in ../data/wikipedia-2: 859
+Only in ../data/wikipedia-2: 86
+Only in ../data/wikipedia-2: 860
+Only in ../data/wikipedia-2: 861
+Only in ../data/wikipedia-2: 862
+Only in ../data/wikipedia-2: 863
+Only in ../data/wikipedia-2: 864
+Only in ../data/wikipedia-2: 865
+Only in ../data/wikipedia-2: 866
+Only in ../data/wikipedia-2: 867
+Only in ../data/wikipedia-2: 868
+Only in ../data/wikipedia-2: 869
+Only in ../data/wikipedia-2: 87
+Only in ../data/wikipedia-2: 870
+Only in ../data/wikipedia-2: 871
+Only in ../data/wikipedia-2: 872
+Only in ../data/wikipedia-2: 873
+Only in ../data/wikipedia-2: 874
+Only in ../data/wikipedia-2: 875
+Only in ../data/wikipedia-2: 876
+Only in ../data/wikipedia-2: 877
+Only in ../data/wikipedia-2: 878
+Only in ../data/wikipedia-2: 879
+Only in ../data/wikipedia-2: 88
+Only in ../data/wikipedia-2: 880
+Only in ../data/wikipedia-2: 881
+Only in ../data/wikipedia-2: 882
+Only in ../data/wikipedia-2: 883
+Only in ../data/wikipedia-2: 884
+Only in ../data/wikipedia-2: 885
+Only in ../data/wikipedia-2: 886
+Only in ../data/wikipedia-2: 887
+Only in ../data/wikipedia-2: 888
+Only in ../data/wikipedia-2: 889
+Only in ../data/wikipedia-2: 89
+Only in ../data/wikipedia-2: 890
+Only in ../data/wikipedia-2: 891
+Only in ../data/wikipedia-2: 892
+Only in ../data/wikipedia-2: 893
+Only in ../data/wikipedia-2: 894
+Only in ../data/wikipedia-2: 895
+Only in ../data/wikipedia-2: 896
+Only in ../data/wikipedia-2: 897
+Only in ../data/wikipedia-2: 898
+Only in ../data/wikipedia-2: 899
+Only in ../data/wikipedia-2: 9
+Only in ../data/wikipedia-2: 90
+Only in ../data/wikipedia-2: 900
+Only in ../data/wikipedia-2: 901
+Only in ../data/wikipedia-2: 902
+Only in ../data/wikipedia-2: 903
+Only in ../data/wikipedia-2: 904
+Only in ../data/wikipedia-2: 905
+Only in ../data/wikipedia-2: 906
+Only in ../data/wikipedia-2: 907
+Only in ../data/wikipedia-2: 908
+Only in ../data/wikipedia-2: 909
+Only in ../data/wikipedia-2: 91
+Only in ../data/wikipedia-2: 910
+Only in ../data/wikipedia-2: 911
+Only in ../data/wikipedia-2: 912
+Only in ../data/wikipedia-2: 913
+Only in ../data/wikipedia-2: 914
+Only in ../data/wikipedia-2: 915
+Only in ../data/wikipedia-2: 916
+Only in ../data/wikipedia-2: 917
+Only in ../data/wikipedia-2: 918
+Only in ../data/wikipedia-2: 919
+Only in ../data/wikipedia-2: 92
+Only in ../data/wikipedia-2: 920
+Only in ../data/wikipedia-2: 921
+Only in ../data/wikipedia-2: 922
+Only in ../data/wikipedia-2: 923
+Only in ../data/wikipedia-2: 924
+Only in ../data/wikipedia-2: 925
+Only in ../data/wikipedia-2: 926
+Only in ../data/wikipedia-2: 927
+Only in ../data/wikipedia-2: 928
+Only in ../data/wikipedia-2: 929
+Only in ../data/wikipedia-2: 93
+Only in ../data/wikipedia-2: 930
+Only in ../data/wikipedia-2: 931
+Only in ../data/wikipedia-2: 932
+Only in ../data/wikipedia-2: 933
+Only in ../data/wikipedia-2: 934
+Only in ../data/wikipedia-2: 935
+Only in ../data/wikipedia-2: 936
+Only in ../data/wikipedia-2: 937
+Only in ../data/wikipedia-2: 938
+Only in ../data/wikipedia-2: 939
+Only in ../data/wikipedia-2: 94
+Only in ../data/wikipedia-2: 940
+Only in ../data/wikipedia-2: 941
+Only in ../data/wikipedia-2: 942
+Only in ../data/wikipedia-2: 943
+Only in ../data/wikipedia-2: 944
+Only in ../data/wikipedia-2: 945
+Only in ../data/wikipedia-2: 946
+Only in ../data/wikipedia-2: 947
+Only in ../data/wikipedia-2: 948
+Only in ../data/wikipedia-2: 949
+Only in ../data/wikipedia-2: 95
+Only in ../data/wikipedia-2: 950
+Only in ../data/wikipedia-2: 951
+Only in ../data/wikipedia-2: 952
+Only in ../data/wikipedia-2: 953
+Only in ../data/wikipedia-2: 954
+Only in ../data/wikipedia-2: 955
+Only in ../data/wikipedia-2: 956
+Only in ../data/wikipedia-2: 957
+Only in ../data/wikipedia-2: 958
+Only in ../data/wikipedia-2: 959
+Only in ../data/wikipedia-2: 96
+Only in ../data/wikipedia-2: 960
+Only in ../data/wikipedia-2: 961
+Only in ../data/wikipedia-2: 962
+Only in ../data/wikipedia-2: 963
+Only in ../data/wikipedia-2: 964
+Only in ../data/wikipedia-2: 965
+Only in ../data/wikipedia-2: 966
+Only in ../data/wikipedia-2: 967
+Only in ../data/wikipedia-2: 968
+Only in ../data/wikipedia-2: 969
+Only in ../data/wikipedia-2: 97
+Only in ../data/wikipedia-2: 970
+Only in ../data/wikipedia-2: 971
+Only in ../data/wikipedia-2: 972
+Only in ../data/wikipedia-2: 973
+Only in ../data/wikipedia-2: 974
+Only in ../data/wikipedia-2: 975
+Only in ../data/wikipedia-2: 976
+Only in ../data/wikipedia-2: 977
+Only in ../data/wikipedia-2: 978
+Only in ../data/wikipedia-2: 979
+Only in ../data/wikipedia-2: 98
+Only in ../data/wikipedia-2: 980
+Only in ../data/wikipedia-2: 981
+Only in ../data/wikipedia-2: 982
+Only in ../data/wikipedia-2: 983
+Only in ../data/wikipedia-2: 984
+Only in ../data/wikipedia-2: 985
+Only in ../data/wikipedia-2: 986
+Only in ../data/wikipedia-2: 987
+Only in ../data/wikipedia-2: 988
+Only in ../data/wikipedia-2: 989
+Only in ../data/wikipedia-2: 99
+Only in ../data/wikipedia-2: 990
+Only in ../data/wikipedia-2: 991
+Only in ../data/wikipedia-2: 992
+Only in ../data/wikipedia-2: 993
+Only in ../data/wikipedia-2: 994
+Only in ../data/wikipedia-2: 995
+Only in ../data/wikipedia-2: 996
+Only in ../data/wikipedia-2: 997
+Only in ../data/wikipedia-2: 998
+Only in ../data/wikipedia-2: 999
